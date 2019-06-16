@@ -1,4 +1,5 @@
 all:
+	You need to install nasm,gcc,grub,xorriso &> /dev/null
 	nasm -f elf32 start.asm -o start.o
 	gcc -Wall -g -m32 -c kernel.c -o k.o
 	ld -m elf_i386 -T link.ld -o boot/kernel.bin start.o k.o
