@@ -4,31 +4,49 @@
 ; Author Carlos Bilbao (Zildj1an) 2019
 ; ############################################################
 
-SECTION .text
 [BITS 32]
-[GLOBAL start]
-[EXTERN main]
+[global start_k]
+[extern main_k]
 
-EXTERN code, bss, end
+; GRUB Multiboot Header
+align 4
+dd		0x1BADB002
+dd		0x00
+dd		- (0x1BADB002+0x00)
 
-start:
+;===============
+; SECTION text
+;===============
+
+section .text
+
+start_k:
+
+	mov esp,stack
 	; start C code
-	mov esp, stack
-	call main
+	call main_k
 	; we shouldn't return
 	sti
 .idle:
 	hlt
 	jmp .idle
 
+;===============
+; SECTION data
+;===============
 
-SECTION .data
+section .data
 
-; will use it
+msg db '> Zildj1an OS (Author Carlos Bilbao)', 0
 
-SECTION .bss
+;===============
+; SECTION bss
+;===============
 
-; other stacks
+section .bss
+
+; Stacks
+
 stack_start:
 	resd 1024
 

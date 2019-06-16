@@ -3,7 +3,7 @@
     Author Carlos Bilbao (Zildj1an) 2019
 */
 
-int main(void){
+int main_k(void){
 
  // work here (todo)
 
