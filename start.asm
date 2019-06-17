@@ -21,7 +21,7 @@ dd		- (0x1BADB002+0x00)
 section .text
 
 start_k:
-
+	cli		; Clean interrupts
 	mov esp,stack
 	; start C code
 	call main_k

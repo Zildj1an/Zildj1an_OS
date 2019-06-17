@@ -10,7 +10,11 @@ int main_k(void){
 
 	unsigned char msg[] = "Welcome to Zildj1an-OS";
 
-	write((unsigned char*)&msg, sizeof(msg), GREEN);
+	cleanScreen();
+
+	write((unsigned char*) &msg, sizeof(msg), GREEN);
+
+	//TODO comandos
 
 	while(1){}
 

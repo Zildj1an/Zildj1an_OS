@@ -16,7 +16,8 @@
 #define BROWN 6
 #define WHITE 15
 
-#define MAX_TEXT 25
+#define ROW_TEXT 25
+#define COLUMN_TEXT 80
 
 typedef int size_t;
 typedef unsigned short UINT16;
