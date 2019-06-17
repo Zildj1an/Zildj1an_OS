@@ -10,7 +10,7 @@ int main_k(void){
 
 	unsigned char msg[] = "Welcome to Zildj1an-OS";
 
-	write((unsigned char*)&msg, sizeof(msg));
+	write((unsigned char*)&msg, sizeof(msg), GREEN);
 
 	while(1){}
 

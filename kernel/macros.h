@@ -20,6 +20,7 @@
 
 typedef int size_t;
 typedef unsigned short UINT16;
+typedef int COLOR;
 
 /* Return values errors */
 #define EINVAL 2
