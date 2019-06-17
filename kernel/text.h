@@ -24,7 +24,7 @@ static inline int invalid_color(COLOR color){
 static int write(unsigned char* msg, size_t count, COLOR color) {
 
 	 int ret = 0;
-	 int i, pos;
+	 int i;
 
 	 SCREEN_BUFFER = (UINT16*) VGA_ADDRESS;
 
@@ -35,17 +35,14 @@ static int write(unsigned char* msg, size_t count, COLOR color) {
 
 	 for(i = 0; i < count; ++i) {
 
-		SCREEN_BUFFER[positionX + (positionY * ROW_TEXT)] = VGA_entry(*(msg + i), color);
+		SCREEN_BUFFER[positionX + (positionY * COLUMN_TEXT)] = VGA_entry(*(msg + i), color);
 
 		positionX++;
 
 		if (positionX == COLUMN_TEXT - 1){
 
 			positionX = 0;
-			positionY++;
-
-			if(positionY == ROW_TEXT - 1)
-				positionY = 0;
+			positionY = (positionY + 1) % (ROW_TEXT - 1);
 		}
 	}
 
@@ -61,8 +58,11 @@ static inline void cleanScreen(void){
 
 	for (i = 0; i < max; ++i) {
 
-		write(msg, 1,BLACK);
+		write((unsigned char*) msg, 1,BLACK);
 	}
+
+	positionX = 0;
+	positionY = 0;
 }
 
 
