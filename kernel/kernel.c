@@ -18,5 +18,7 @@ int main_k(void){
 	 SCREEN_BUFFER[0] = VGA_entry('e');
 	 SCREEN_BUFFER[0] = VGA_entry('!');
 
+	while(1){}
+
  return 0;
 }
