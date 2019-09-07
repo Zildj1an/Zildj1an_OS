@@ -29,4 +29,6 @@ typedef int COLOR;
 #define EINVAL 2
 
 
+typedef unsigned char UINT8;
+
 #endif

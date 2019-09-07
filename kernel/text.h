@@ -2,6 +2,9 @@
 #define _TEXT_H_
 
 #include "macros.h"
+#include "keyboard.h"
+#include "io.h"
+
 
 UINT16* SCREEN_BUFFER;
 
@@ -67,10 +70,36 @@ static inline void cleanScreen(void){
 	positionY = 0;
 }
 
-static void read_I(unsigned char *command){
+static void intToStr(int num, unsigned char *str) {
+	int offset = 0, mult = 1000000;
+	while(mult > 0) {
+		*(str+offset) = (char) '0' + (num/mult % 10);
+		mult = mult / 10;
+		offset = offset + 1;
+	}
+	*(str+offset) = '\n';
+}
 
-	//TODO
-	while(1){}
+static void printInt(UINT8 num) {
+	unsigned char buf[8];
+	intToStr(num, &buf);
+	write_O(&buf, 8, GREEN);
+}
+
+static void read_I(unsigned char *command){	
+	int offset = 0;
+	char key;
+	do {
+		key = read_kb();
+		*(command+offset) = key;
+		write_O(&key, 1, GREEN);
+		++offset;
+	} while(key != '\n' && offset < MAX_COMMAND);
+	if(*(command+offset-1) != '\n') {
+		char c = '\n';
+		write_O(&c, 1, GREEN);
+	}
+	return;
 }
 
 #endif
