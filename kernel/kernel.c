@@ -17,8 +17,8 @@ int main_k(void){
 	unsigned char command[MAX_COMMAND];
 
 	cleanScreen();
-	
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
+	
 	if(init_kb() == 1) {
 		return 0;
 	}
