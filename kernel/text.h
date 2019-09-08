@@ -56,19 +56,28 @@ end:
 }
 
 static int replace_O(unsigned char* msg, size_t count, COLOR color) {
+	
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
-	if(positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+	
+	if (positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
-	return write_O(msg, count, color);
+	
+  return write_O(msg, count, color);
 }
 
 static int delete_O(size_t count) {
+	
 	unsigned char empty[count];
+	
 	for(int i = 0; i < count; ++i) empty[i] = ' ';
+	
 	int ret = replace_O((unsigned char *) empty, count, GREEN);
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
+	
 	if(positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
+	
 	return ret;
 }
 
@@ -88,8 +97,10 @@ static inline void cleanScreen(void){
 }
 
 static void intToStr(int num, unsigned char *str) {
+	
 	int offset = 0, mult = 1000000;
-	while(mult > 0) {
+	
+	while (mult > 0) {
 		*(str+offset) = (char) '0' + (num/mult % 10);
 		mult = mult / 10;
 		offset = offset + 1;
@@ -98,12 +109,14 @@ static void intToStr(int num, unsigned char *str) {
 }
 
 static void printInt(UINT8 num) {
+	
 	unsigned char buf[8];
 	intToStr(num, (unsigned char*) &buf);
 	write_O((unsigned char*) &buf, 8, GREEN);
 }
 
 static void read_I(unsigned char *command){	
+	
 	int offset = 0;
 	keypress kp;
 	do {	
@@ -119,8 +132,9 @@ static void read_I(unsigned char *command){
 				++offset;
 			}
 		}
-	} while((kp.c != '\n' || kp.pressed == 1) && offset < MAX_COMMAND);
-	if(*(command+offset-1) != '\n') {
+	} while ((kp.c != '\n' || kp.pressed == 1) && offset < MAX_COMMAND);
+	
+	if (*(command+offset-1) != '\n') {
 		char c = '\n';
 		write_O((unsigned char*)&c, 1, GREEN);
 	}
