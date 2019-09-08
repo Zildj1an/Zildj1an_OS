@@ -1,5 +1,5 @@
 /*
-Basic keyboard driver based on polling
+Basic keyboard driver based on interrupts
 Author: Pablo Villalobos (pablo-vs)
 */
 
@@ -8,6 +8,7 @@ This is barely usable.
 Issues:
 	1. Does not suport caps, control sequences, etc.
 	2. The keyboard layout is wrong.
+        3. Should move the PIC stuff to interrupts.h
 */
 
 
