@@ -19,9 +19,8 @@ int main_k(void){
 	cleanScreen();
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
 	
-	if(init_kb() == 1) {
+	if(init_kb() == 1) 
 		return 0;
-	}
 	
 	while(1){
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
