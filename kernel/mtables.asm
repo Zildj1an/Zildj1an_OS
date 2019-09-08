@@ -21,7 +21,7 @@ idt_desc:
 
 section .text
 	
-setup_gdt:			; Note that interrupts were already disabled in start.asm
+load_gdt:			; Note that interrupts were already disabled in start.asm
 	mov eax, [esp + 4]	; Set address (first arg)
    	mov [gdt_desc + 2], eax
    	mov ax, [esp + 8]	; Set size (second arg)
@@ -38,9 +38,10 @@ reload_CS:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
+	ret
 
 
-setup_idt:
+load_idt:
 	mov eax, [esp + 4]	; Set address (first arg)
    	mov [idt_desc + 2], eax
    	mov ax, [esp + 8]	; Set size (second arg)

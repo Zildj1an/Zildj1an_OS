@@ -8,7 +8,6 @@
 #include "keyboard.h"
 #include "interrupts.h"
 
-
 int main_k(void){
 	
 	setup_interrupts();
