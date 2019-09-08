@@ -10,8 +10,6 @@ Authos: Pablo Villalobos (pablo-vs)
 
 #define IDT_SIZE 256
 
-
-
 static int write_O(unsigned char * msg, size_t count, COLOR color);
 
 // TODO: more readable GDT description
@@ -28,7 +26,6 @@ typedef struct {
 } IDTDescr;
 
 static IDTDescr IDT[IDT_SIZE];
-
 
 extern void load_gdt(UINT8* GDT, size_t size);
 extern void reload_segments();
