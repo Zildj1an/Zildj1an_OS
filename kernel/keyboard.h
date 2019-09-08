@@ -1,6 +1,18 @@
 /*
 Basic keyboard driver based on polling
+Author: Pablo Villalobos (pablo-vs)
 */
+
+/*
+This is almost completely useless.
+Issues:
+	1. This code behaves as if the keyboard sent characters directly and never
+	sent key release codes or other special codes, and therefore does not suport
+	caps, control sequences, etc.
+	2. The keyboard layout is wrong.
+	3. It only works via polling, interrupts are preferable.
+*/
+
 
 #ifndef _KEYBOARD_H
 #define _KEYBOARD_H

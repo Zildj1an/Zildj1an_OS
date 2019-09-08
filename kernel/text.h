@@ -82,8 +82,8 @@ static void intToStr(int num, unsigned char *str) {
 
 static void printInt(UINT8 num) {
 	unsigned char buf[8];
-	intToStr(num, &buf);
-	write_O(&buf, 8, GREEN);
+	intToStr(num, (unsigned char*) &buf);
+	write_O((unsigned char*) &buf, 8, GREEN);
 }
 
 static void read_I(unsigned char *command){	
@@ -92,12 +92,12 @@ static void read_I(unsigned char *command){
 	do {
 		key = read_kb();
 		*(command+offset) = key;
-		write_O(&key, 1, GREEN);
+		write_O((unsigned char*)&key, 1, GREEN);
 		++offset;
 	} while(key != '\n' && offset < MAX_COMMAND);
 	if(*(command+offset-1) != '\n') {
 		char c = '\n';
-		write_O(&c, 1, GREEN);
+		write_O((unsigned char*)&c, 1, GREEN);
 	}
 	return;
 }
