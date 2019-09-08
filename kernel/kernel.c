@@ -17,8 +17,8 @@ int main_k(void){
 	setup_interrupts();
 
 	unsigned char msg[] = "Welcome to Zildj1an-OS\n";
-	unsigned char prompt[] = "ZildOS >";
-	unsigned char command[MAX_COMMAND];
+    unsigned char prompt[] = "ZildOS >";
+    unsigned char command[MAX_COMMAND];
 
 	cleanScreen();
 	write_O((unsigned char*) &msg, sizeof(msg), RED);

@@ -94,25 +94,6 @@ static inline void cleanScreen(void){
 	positionY = 0;
 }
 
-static void intToStr(int num, unsigned char *str) {
-
-	int offset = 0, mult = 1000000;
-
-	while (mult > 0) {
-		*(str+offset) = (char) '0' + (num/mult % 10);
-		mult = mult / 10;
-		offset = offset + 1;
-	}
-	*(str+offset) = '\n';
-}
-
-static void printInt(UINT8 num) {
-
-	unsigned char buf[8];
-	intToStr(num, (unsigned char*) &buf);
-	write_O((unsigned char*) &buf, 8, GREEN);
-}
-
 static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int size_a, unsigned int size_b){
 
 	unsigned int i;
@@ -143,24 +124,37 @@ unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 	return ptr;
 }
 
+static inline int is_alpha(char c) {
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+}
+
 static void read_I(unsigned char *command){
 
 	int offset = 0;
 	keypress kp;
 	do {
 		kp = read_kb();
-		if(kp.special != 0xFF && kp.pressed == 0) {
-			if(kp.c == '\b') {
-				delete_O(1); //TODO add Ctr + K (?)
-				if(offset > 0) --offset;
-			}
-			else {
-				command[offset] = kp.c;
-				write_O(command+offset, 1, GREEN);
-				++offset;
-			}
+		if(is_valid(kp) && !is_released(kp)) {
+            if(is_ctrl(kp)) {
+                //Ctrl+<>
+            }
+            else if(is_alt(kp)) {
+                //Alt+<>
+            }
+            else {
+			    if(kp.c == '\b') {
+				    delete_O(1); //TODO add Ctr + K (?)
+				    if(offset > 0) --offset;
+			    }
+			    else {
+                    if(!is_caps(kp) && is_alpha(kp.c)) kp.c += ('a'-'A');
+				    command[offset] = kp.c;
+				    write_O(command+offset, 1, GREEN);
+				    ++offset;
+			    }
+            }
 		}
-	} while ((kp.c != '\n' || kp.pressed == 1) && offset < MAX_COMMAND);
+	} while ((kp.c != '\n' || is_released(kp)) && offset < MAX_COMMAND);
 
 	if (*(command+offset-1) != '\n') {
 		char c = '\n';

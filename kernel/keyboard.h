@@ -4,11 +4,12 @@ Author: Pablo Villalobos (pablo-vs)
 */
 
 /*
-This is barely usable.
+Usage: Call init_kb(), read keypresses with read_kb().
+Note: this is barely usable.
 Issues:
 	1. Does not suport caps, control sequences, etc.
 	2. The keyboard layout is wrong.
-        3. Should move the PIC stuff to interrupts.h
+    3. Should move the PIC stuff to interrupts.h
 */
 
 
@@ -19,11 +20,12 @@ Issues:
 #include "interrupts.h"
 
 
-//IO port addresses
-#define STATUS_REG (UINT16) 0x64
-#define DATA_REG (UINT16) 0x60
-
-#define WAIT_TIMEOUT 10
+//PS2 IO definitions
+#define PS2_STATUS_REG (UINT16) 0x64
+#define PS2_DATA_REG (UINT16) 0x60
+#define PS2_READ_CCB 0x20
+#define PS2_WRITE_CCB 0x60
+#define PS2_TRANSLATION_BIT 6
 
 //Keyboard command codes
 #define KB_ACK (UINT8) 0xFA
@@ -42,8 +44,18 @@ Issues:
 #define PIC_EOI		0x20
 #define PIC1_IRQ_OFFSET 0x40 
 #define PIC2_IRQ_OFFSET 0x48
+#define PIC_INITIALIZE 0x11
+#define PIC_KB_IRQ 1
+
+//Driver
+#define BUF_SIZE 128 
 
 //Keycodes
+#define KEY_RELEASED 0xF0
+#define KEY_ALT 0x11
+#define KEY_SHIFT 0x12
+#define KEY_CTRL 0x14
+#define KEY_CAPS_LOCK 0x58
 
 unsigned char keycodes[] = {
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -58,30 +70,50 @@ unsigned char keycodes[] = {
 	0, '.', '/', 'L', ';', 'P', '-', 0,	//0x40-0x4F	
 	0, 0, '\'', 0, '[', '=', 0, 0,
 	0, 0, '\n', ']', 0, '\\', 0, 0,		//0x50-0x5F	
-	0, 0, 0, 0, 0, 0, '\b', 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0x60-0x6F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0x70-0x7F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0x80-0x8F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0x90-0x9F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xA0-0xAF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xB0-0xBF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xC0-0xCF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xD0-0xDF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xE0-0xEF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xF0-0xFF	
+	0, 0, 0, 0, 0, 0, '\b', 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x60-0x6F	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x70-0x7F	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x80-0x8F	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x90-0x9F	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xA0-0xAF	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xB0-0xBF	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xC0-0xCF	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xD0-0xDF	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xE0-0xEF	
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xF0-0xFF	
 };
 
 
+/*
+Represents a key press (or release). c is the ASCII character of the key.
+The bits in info represent the following:
+    Bit     Meaning
+    0       0 for key press, 1 for key release
+    1       Caps (1 = enabled)
+    2       Ctrl pressed
+    3       Alt pressed
+    4-6     Unused
+    7       0 if this is a valid keypress (a 1 here usually means that there are no
+            keypresses in the output buffer)    
+*/
 typedef struct {
 	char c;
-	UINT8 special;
-	UINT8 pressed;
+	UINT8 info;
 } keypress;
 
-static UINT8 inputBuffer[128];
+static inline int is_released(keypress kp) {return kp.info & 1;}
+static inline int is_caps(keypress kp) {return kp.info & (1<<1);}
+static inline int is_ctrl(keypress kp) {return kp.info & (1<<2);}
+static inline int is_alt(keypress kp) {return kp.info & (1<<3);}
+static inline int is_valid(keypress kp) {return !(kp.info & (1<<7));}
+
+
+static UINT8 inputBuffer[BUF_SIZE];
 static UINT16 input_write_offset = 0, input_read_offset = 0;
 
-static keypress outputBuffer[128];
+static keypress outputBuffer[BUF_SIZE];
 static UINT16 output_write_offset = 0, output_read_offset = 0;
+static UINT8 caps = 0, ctrl = 0, alt = 0, shift = 0;
+
 
 static char fromKeycode(UINT8 kc) {
 	return keycodes[kc];
@@ -90,18 +122,18 @@ static char fromKeycode(UINT8 kc) {
 static int sendb(UINT8 data) {
 	UINT8 ready = 1;
 	while(ready != 0) {
-		ready = inb(STATUS_REG) & 2;
+		ready = inb(PS2_STATUS_REG) & 2;
 	}
-	outb(DATA_REG, data);
+	outb(PS2_DATA_REG, data);
 	return 0;
 }
 
 static UINT8 readb() {
 	UINT8 ready = 0;
 	while(ready == 0) {
-		ready = inb(STATUS_REG) & 1;
+		ready = inb(PS2_STATUS_REG) & 1;
 	}
-	UINT8 data = inb(DATA_REG);
+	UINT8 data = inb(PS2_DATA_REG);
 	return data;
 }
 
@@ -119,36 +151,53 @@ static void pic_eoi(unsigned char irq) {
 }
 
 static void process_keypress() {	
-	UINT8 complete = 0, pending = 0;
+	UINT8 complete = 0, release = 0;
 	keypress kp;
 	while(complete == 0 && input_read_offset != input_write_offset) {
 		UINT8 kc = inputBuffer[input_read_offset];
 		++input_read_offset;
-		if(input_read_offset >= 128) input_read_offset = 0;
+		if(input_read_offset >= BUF_SIZE) input_read_offset = 0;
 
-		kp.special = 0;
-		if(kc < 0x70) {
+		kp.info = 0;
+        if(kc == KEY_ALT) {
+            if(release == 1) alt = 0;
+            else alt = 1;
+        }
+        else if(kc == KEY_CTRL) {
+            if(release == 1) ctrl = 0;
+            else ctrl = 1;
+        }
+        else if(kc == KEY_SHIFT) {
+            if(release == 1) shift = 0;
+            else shift = 1;
+        }
+        else if(kc == KEY_CAPS_LOCK) {
+            if(release == 1) caps = 0;
+            else caps = 1;
+        }
+		else if(kc < 0x70) {
+            // Regular character
 			kp.c = fromKeycode(kc);
-			kp.pressed = pending;
-			pending = 0;
+			kp.info = release | (caps^shift)<<1 | ctrl<<2 | alt<<3;
+			release = 0;
 			complete = 1;
 		}
-		else if(kc == 0xF0) {
-			pending = 1;
+		else if(kc == KEY_RELEASED) {
+			release = 1;
 		}
 	}
 	if(complete != 0) {
 		outputBuffer[output_write_offset] = kp;
 		++output_write_offset;
-		if(output_write_offset >= 128) output_write_offset = 0;
+		if(output_write_offset >= BUF_SIZE) output_write_offset = 0;
 	}
 }
 
 __attribute__((interrupt)) static void kb_isr(struct interrupt_frame* frame) {
-	UINT8 kc = inb(DATA_REG);
+	UINT8 kc = inb(PS2_DATA_REG);
 	inputBuffer[input_write_offset] = kc;
 	++input_write_offset;
-	if(input_write_offset >= 128) input_write_offset = 0;
+	if(input_write_offset >= BUF_SIZE) input_write_offset = 0;
 	pic_eoi(1);
 }
 
@@ -158,23 +207,28 @@ static void init_pic() {
 	outb(PIC1_DATA, 0xFF);
 	outb(PIC2_DATA, 0xFF);
 
-	outb(PIC1_COMMAND, 0x11);
+    //Configure both PICs: initialize and set offset
+	outb(PIC1_COMMAND, PIC_INITIALIZE);
 	io_wait();
-	outb(PIC1_COMMAND, 0x11);
+	outb(PIC1_COMMAND, PIC_INITIALIZE);
 	io_wait();
 	outb(PIC1_DATA, PIC1_IRQ_OFFSET);
 	io_wait();
 	outb(PIC2_DATA, PIC2_IRQ_OFFSET);
 	io_wait();
+    //PIC1 has slave on line 2
 	outb(PIC1_DATA, 4);
 	io_wait();
+    //PIC2 is slave
 	outb(PIC2_DATA, 2);
 	io_wait();
+    //Some conf
 	outb(PIC1_DATA, 1);
 	io_wait();
 	outb(PIC2_DATA, 1);
 	io_wait();
 
+    //Mask again
 	outb(PIC1_DATA, 0xFF);
 	io_wait();
 	outb(PIC2_DATA, 0xFF);
@@ -210,10 +264,10 @@ static int init_kb() {
 	int retval = -1;
 	if(check_kb() == 0) {
 		//Disable PS/2 controller translation
-		outb(0x64, 0x20);
+		outb(PS2_STATUS_REG, PS2_READ_CCB);
 		UINT8 res = readb();
-		outb(0x64, 0x60);
-		res &= ~64;
+		outb(PS2_STATUS_REG, PS2_WRITE_CCB);
+		res &= ~(1<<PS2_TRANSLATION_BIT);
 		sendb(res);
 		//Set scan code set 2
 		sendb(KB_SET_SCAN_CODE);
@@ -224,9 +278,10 @@ static int init_kb() {
 			sendb(KB_SCAN_ENABLE);
 			res = readb();
 			if(res == KB_ACK) {
+                //Setup interrupt controller
 				init_pic();
-				addIDTEntry(kb_isr, 0x41, 0b10001110);
-				umask_pic(1);
+				addIDTEntry(kb_isr, PIC1_IRQ_OFFSET+PIC_KB_IRQ, 0b10001110);
+				umask_pic(PIC_KB_IRQ);
 				retval = 0;
 			}
 		}
@@ -236,12 +291,12 @@ static int init_kb() {
 
 static keypress read_kb() {
 	keypress kp;
-	kp.special = 0xFF;
+	kp.info = 1<<7;
 	if(output_read_offset == output_write_offset) process_keypress();
 	if(output_read_offset != output_write_offset) {
 		kp = outputBuffer[output_read_offset];
 		++output_read_offset;
-		if(output_read_offset >= 128) output_read_offset = 0;
+		if(output_read_offset >= BUF_SIZE) output_read_offset = 0;
 	}
 	return kp;
 }

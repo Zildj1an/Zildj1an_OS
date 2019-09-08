@@ -29,7 +29,7 @@ typedef int COLOR;
 #define EINVAL 2
 
 /* Commands*/
-#define MAX_COMMAND 800
+#define MAX_COMMAND 30
 #define NUM_COMMANDS 1
 #define EXIT_COMMAND 0
 

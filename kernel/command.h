@@ -22,11 +22,13 @@ struct command *command_list[NUM_COMMANDS];
 static void init_commands(void){
 
 	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"EXIT");
-	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Finish the OS session");
+    	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Finish the OS session");
 	command_list[EXIT_COMMAND]->id = EXIT_COMMAND;
 }
 
-static void execute(int id){}
+static void execute(int id){
+	
+}
 
 static int execute_command(unsigned char* command){
 
