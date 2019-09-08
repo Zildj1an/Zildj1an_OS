@@ -5,7 +5,6 @@
 #include "keyboard.h"
 #include "io.h"
 
-
 UINT16* SCREEN_BUFFER;
 
 static int positionX = 0;
@@ -21,7 +20,6 @@ static inline int invalid_color(COLOR color){
 	return (color != BLACK && color != BLUE && color != GREEN && color != RED
 	  && color != BROWN && color != WHITE);
 }
-
 
 /* For now we assume stdout as Output */
 static int write_O(unsigned char* msg, size_t count, COLOR color) {
@@ -56,28 +54,28 @@ end:
 }
 
 static int replace_O(unsigned char* msg, size_t count, COLOR color) {
-	
+
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
-	
+
 	if (positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
-	
+
   return write_O(msg, count, color);
 }
 
 static int delete_O(size_t count) {
-	
+
 	unsigned char empty[count];
-	
+
 	for(int i = 0; i < count; ++i) empty[i] = ' ';
-	
+
 	int ret = replace_O((unsigned char *) empty, count, GREEN);
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
-	
+
 	if(positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
-	
+
 	return ret;
 }
 
@@ -97,9 +95,9 @@ static inline void cleanScreen(void){
 }
 
 static void intToStr(int num, unsigned char *str) {
-	
+
 	int offset = 0, mult = 1000000;
-	
+
 	while (mult > 0) {
 		*(str+offset) = (char) '0' + (num/mult % 10);
 		mult = mult / 10;
@@ -109,10 +107,40 @@ static void intToStr(int num, unsigned char *str) {
 }
 
 static void printInt(UINT8 num) {
-	
+
 	unsigned char buf[8];
 	intToStr(num, (unsigned char*) &buf);
 	write_O((unsigned char*) &buf, 8, GREEN);
+}
+
+static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int size_a, unsigned int size_b){
+
+	unsigned int i;
+        if(size_a != size_b) return -EINVAL;
+        for(i = 0; i < size_a && a[i] == b[i]; ++i){}
+
+        return (i == size_a);
+}
+
+// Function to implement strcpy() function
+unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
+
+	// return if no memory is allocated to the destination
+	if (destination == NULL)
+		return NULL;
+
+	unsigned char *ptr = destination;
+
+	while (*source != '\0')
+	{
+		*destination = *source;
+		destination++;
+		source++;
+	}
+
+	*destination = '\0';
+
+	return ptr;
 }
 
 static void read_I(unsigned char *command){

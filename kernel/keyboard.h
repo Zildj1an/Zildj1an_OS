@@ -68,7 +68,6 @@ unsigned char keycodes[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xD0-0xDF	
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xE0-0xEF	
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, '`', 0,	//0xF0-0xFF	
-	
 };
 
 
@@ -181,7 +180,8 @@ static void init_pic() {
 	outb(PIC2_DATA, 0xFF);
 }
 
-static void mask_pic(UINT8 irq) {
+static void inline mask_pic(UINT8 irq) {
+
 	if(irq < 8) {
 		UINT8 cmask = inb(PIC1_DATA);
 		cmask |= 1<<irq;
@@ -193,7 +193,8 @@ static void mask_pic(UINT8 irq) {
 	}
 }
 
-static void umask_pic(UINT8 irq) {
+static void inline umask_pic(UINT8 irq) {
+
 	if(irq < 8) {
 		UINT8 cmask = inb(PIC1_DATA);
 		cmask &= ~(1<<irq);
