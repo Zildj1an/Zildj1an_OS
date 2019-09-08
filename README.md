@@ -1,2 +1,7 @@
-# My_kernel
-A very small OS kernel.
+# Zildj1an-OS
+
+A very light Operative System.
+
+## Contributors
+* Carlos Bilbao.
+* Pablo Villalobos.
