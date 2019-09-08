@@ -55,6 +55,23 @@ end:
 	return ret;
 }
 
+static int replace_O(unsigned char* msg, size_t count, COLOR color) {
+	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
+	if(positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
+	return write_O(msg, count, color);
+}
+
+static int delete_O(size_t count) {
+	unsigned char empty[count];
+	for(int i = 0; i < count; ++i) empty[i] = ' ';
+	int ret = replace_O((unsigned char *) empty, count, GREEN);
+	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
+	if(positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
+	return ret;
+}
+
 static inline void cleanScreen(void){
 
 	int i = 0;
@@ -88,13 +105,21 @@ static void printInt(UINT8 num) {
 
 static void read_I(unsigned char *command){	
 	int offset = 0;
-	char key;
-	do {
-		key = read_kb();
-		*(command+offset) = key;
-		write_O((unsigned char*)&key, 1, GREEN);
-		++offset;
-	} while(key != '\n' && offset < MAX_COMMAND);
+	keypress kp;
+	do {	
+		kp = read_kb();
+		if(kp.special != 0xFF && kp.pressed == 0) {
+			if(kp.c == '\b') {	
+				delete_O(1);
+				if(offset > 0) --offset;
+			}
+			else {
+				command[offset] = kp.c;
+				write_O(command+offset, 1, GREEN);
+				++offset;
+			}
+		}
+	} while((kp.c != '\n' || kp.pressed == 1) && offset < MAX_COMMAND);
 	if(*(command+offset-1) != '\n') {
 		char c = '\n';
 		write_O((unsigned char*)&c, 1, GREEN);

@@ -19,7 +19,7 @@
 #define ROW_TEXT 25
 #define COLUMN_TEXT 80
 
-#define MAX_COMMAND 30
+#define MAX_COMMAND 800
 
 typedef int size_t;
 typedef unsigned short UINT16;
@@ -30,5 +30,6 @@ typedef int COLOR;
 
 
 typedef unsigned char UINT8;
+typedef unsigned int UINT32;
 
 #endif
