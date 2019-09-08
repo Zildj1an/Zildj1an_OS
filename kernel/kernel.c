@@ -1,6 +1,9 @@
 /*
     Called by start.asm
-    Author Carlos Bilbao (Zildj1an) 2019
+    Authors:
+    Carlos Bilbao (Zildj1an) 
+    Pablo Villalobos (pablo-vs)
+    2019
 */
 
 #include "text.h"
