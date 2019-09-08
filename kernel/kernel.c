@@ -22,14 +22,12 @@ int main_k(void){
 
 	cleanScreen();
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
-
-	if(init_kb() == 1)
-		goto end;
+        init_kb()
 
 	while(1){
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
 		read_I((unsigned char*) &command);
-                execute_command((unsigned char*) &command);
+                if(execute_command((unsigned char*) &command) == EXIT_COMMAND) break;
 	}
 
 end:

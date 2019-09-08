@@ -28,6 +28,8 @@ typedef int COLOR;
 /* Return values errors */
 #define EINVAL 2
 
+/* Commands*/
+#define EXIT_COMMAND 0
 
 typedef unsigned char UINT8;
 typedef unsigned int UINT32;
