@@ -115,15 +115,15 @@ static void printInt(UINT8 num) {
 	write_O((unsigned char*) &buf, 8, GREEN);
 }
 
-static void read_I(unsigned char *command){	
-	
+static void read_I(unsigned char *command){
+
 	int offset = 0;
 	keypress kp;
-	do {	
+	do {
 		kp = read_kb();
 		if(kp.special != 0xFF && kp.pressed == 0) {
-			if(kp.c == '\b') {	
-				delete_O(1);
+			if(kp.c == '\b') {
+				delete_O(1); //TODO add Ctr + K (?)
 				if(offset > 0) --offset;
 			}
 			else {
@@ -133,7 +133,7 @@ static void read_I(unsigned char *command){
 			}
 		}
 	} while ((kp.c != '\n' || kp.pressed == 1) && offset < MAX_COMMAND);
-	
+
 	if (*(command+offset-1) != '\n') {
 		char c = '\n';
 		write_O((unsigned char*)&c, 1, GREEN);

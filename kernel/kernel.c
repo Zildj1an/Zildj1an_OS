@@ -1,7 +1,7 @@
 /*
     Called by start.asm
     Authors:
-    Carlos Bilbao (Zildj1an) 
+    Carlos Bilbao (Zildj1an)
     Pablo Villalobos (pablo-vs)
     2019
 */
@@ -10,9 +10,10 @@
 #include "macros.h"
 #include "keyboard.h"
 #include "interrupts.h"
+#include "command.h"
 
 int main_k(void){
-	
+
 	setup_interrupts();
 
 	unsigned char msg[] = "Welcome to Zildj1an-OS\n";
@@ -21,17 +22,17 @@ int main_k(void){
 
 	cleanScreen();
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
-	
-	if(init_kb() == 1) 
+
+	if(init_kb() == 1)
 		goto end;
-	
+
 	while(1){
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
 		read_I((unsigned char*) &command);
-		//TODO execute
+                execute_command((unsigned char*) &command);
 	}
 
 end:
-	
+
  return 0;
 }
