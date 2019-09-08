@@ -20,7 +20,7 @@ int main_k(void){
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
 	
 	if(init_kb() == 1) 
-		return 0;
+		goto end;
 	
 	while(1){
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
@@ -28,5 +28,7 @@ int main_k(void){
 		//TODO execute
 	}
 
+end:
+	
  return 0;
 }
