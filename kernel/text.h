@@ -55,25 +55,32 @@ end:
 
 static int replace_O(unsigned char* msg, size_t count, COLOR color) {
 
+	int ret;
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
 
-	if (positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+	if (positionX < count)
+		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
-
-  return write_O(msg, count, color);
+	ret = write_O(msg, count, color);
+	
+    return ret;
 }
 
 static int delete_O(size_t count) {
 
+	int ret,i;
 	unsigned char empty[count];
 
-	for(int i = 0; i < count; ++i) empty[i] = ' ';
+	for (i = 0; i < count; ++i) 
+		empty[i] = ' ';
 
-	int ret = replace_O((unsigned char *) empty, count, GREEN);
+	ret = replace_O((unsigned char *) empty, count, GREEN);
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
 
-	if(positionX < count) positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+	if (positionX < count) 
+		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
+	
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 
 	return ret;
@@ -81,14 +88,12 @@ static int delete_O(size_t count) {
 
 static inline void cleanScreen(void){
 
-	int i = 0;
+	unsigned int i = 0;
 	unsigned char *msg = (unsigned char*) ' ';
 	int max = ROW_TEXT * COLUMN_TEXT;
 
-	for (i = 0; i < max; ++i) {
-
+	for (i = 0; i < max; ++i) 
 		write_O((unsigned char*) msg, 1,BLACK);
-	}
 
 	positionX = 0;
 	positionY = 0;
@@ -97,8 +102,8 @@ static inline void cleanScreen(void){
 static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int size_a, unsigned int size_b){
 
 	unsigned int i;
-        if(size_a != size_b) return -EINVAL;
-        for(i = 0; i < size_a && a[i] == b[i]; ++i){}
+        if (size_a != size_b) return -EINVAL;
+        for (i = 0; i < size_a && a[i] == b[i]; ++i){}
 
         return (i == size_a);
 }
@@ -106,14 +111,15 @@ static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int siz
 // Function to implement strcpy() function
 unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 
+	unsigned char *ptr 
+		
 	// return if no memory is allocated to the destination
 	if (destination == NULL)
 		return NULL;
 
-	unsigned char *ptr = destination;
+	ptr = destination;
 
-	while (*source != '\0')
-	{
+	while (*source != '\0'){
 		*destination = *source;
 		destination++;
 		source++;
@@ -132,22 +138,25 @@ static void read_I(unsigned char *command){
 
 	int offset = 0;
 	keypress kp;
+	
 	do {
 		kp = read_kb();
-		if(is_valid(kp) && !is_released(kp)) {
-            if(is_ctrl(kp)) {
-                //Ctrl+<>
-            }
-            else if(is_alt(kp)) {
-                //Alt+<>
-            }
+		if (is_valid(kp) && !is_released(kp)) {
+			
+		    if (is_ctrl(kp)) {
+			//Ctrl+<>
+		    }
+		    else if(is_alt(kp)) {
+			//Alt+<>
+		    }
             else {
-			    if(kp.c == '\b') {
+			    if (kp.c == '\b') {
 				    delete_O(1); //TODO add Ctr + K (?)
 				    if(offset > 0) --offset;
 			    }
 			    else {
-                    if(!is_caps(kp) && is_alpha(kp.c)) kp.c += ('a'-'A');
+				    if (!is_caps(kp) && is_alpha(kp.c))
+					    kp.c += ('a'-'A');
 				    command[offset] = kp.c;
 				    write_O(command+offset, 1, GREEN);
 				    ++offset;
