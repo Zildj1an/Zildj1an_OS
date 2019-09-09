@@ -40,7 +40,8 @@ __attribute__((interrupt)) static void empty_isr(struct interrupt_frame* frame) 
 
 
 static void addIDTEntry(void (*isr)(struct interrupt_frame*), UINT16 pos, UINT8 type_attr) {
-	if(pos < IDT_SIZE) {
+	
+	if (pos < IDT_SIZE) {
 		IDTDescr desc;
 		desc.offset_1 = ((UINT32) isr) & 0xFFFF;
 		desc.offset_2 = (((UINT32) isr) >> 16) & 0xFFFF;
@@ -53,13 +54,15 @@ static void addIDTEntry(void (*isr)(struct interrupt_frame*), UINT16 pos, UINT8 
 }
 
 static void setup_interrupts() {
+	
+	unsigned int i;
 
 	// First, load the GDT
 	load_gdt(GDT, sizeof(GDT));
 	reload_segments();
 
 	// TODO Populate IDT
-	for(int i = 0; i < 256; ++i)
+	for (i = 0; i < 256; ++i)
 		addIDTEntry(empty_isr, i, 0b10001111);
 
 	// Load the IDT (and enable interrupts)
