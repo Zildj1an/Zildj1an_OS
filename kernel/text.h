@@ -34,7 +34,7 @@ static int write_O(unsigned char* msg, size_t count, COLOR color) {
 		goto end;
 	 }
 
-	 for(i = 0; i < count; ++i) {
+	 for (i = 0; i < count; ++i) {
 
 		if(*(msg + i) == '\n') goto line;
 
