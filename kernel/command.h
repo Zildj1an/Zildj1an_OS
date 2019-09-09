@@ -1,6 +1,7 @@
 /*
    Manages on-terminal command execution
    Author Carlos Bilbao (Zildj1an)
+          Pablo Villalobos (pablo-vs)
 */
 
 #ifndef _COMMAND_H
