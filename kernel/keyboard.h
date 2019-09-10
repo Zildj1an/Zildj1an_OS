@@ -1,9 +1,7 @@
 /*
 Basic keyboard driver based on interrupts
 Author: Pablo Villalobos (pablo-vs)
-*/
 
-/*
 Usage: Call init_kb(), read keypresses with read_kb().
 Note: this is barely usable.
 Issues:
@@ -117,7 +115,6 @@ static inline int is_alpha(char c) {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-
 static UINT8 inputBuffer[BUF_SIZE];
 static UINT16 input_write_offset = 0, input_read_offset = 0;
 
@@ -133,11 +130,14 @@ static char fromKeycode(UINT8 kc) {
     if(is_alpha(c))
       c += caps*(shift*('a'-'A') + !shift*('A'-'a'));
     return c;
+
 }
 
 static int sendb(UINT8 data) {
+	
 	UINT8 ready = 1;
-	while(ready != 0) {
+	
+	while (ready) {
 		ready = inb(PS2_STATUS_REG) & 2;
 	}
 	outb(PS2_DATA_REG, data);
@@ -145,50 +145,55 @@ static int sendb(UINT8 data) {
 }
 
 static UINT8 readb() {
+	
 	UINT8 ready = 0;
-	while(ready == 0) {
+	while(!ready) 
 		ready = inb(PS2_STATUS_REG) & 1;
-	}
+	
 	UINT8 data = inb(PS2_DATA_REG);
 	return data;
 }
 
 static int check_kb() {
+	
 	int retval = -1;
 	sendb(KB_ECHO);
 	UINT8 val = readb();
-	if(val == KB_ECHO) retval = 0;
+	if(val == KB_ECHO) 
+		retval = 0;
+	
 	return retval;
 }
 
 static void pic_eoi(unsigned char irq) {
-	if(irq >= 8) outb(PIC2_COMMAND, PIC_EOI);
+	
+	if(irq >= 8) 
+		outb(PIC2_COMMAND, PIC_EOI);
 	outb(PIC1_COMMAND, PIC_EOI);
 }
 
 static void process_keypress() {	
+	
 	UINT8 complete = 0, release = 0;
 	keypress kp;
-	while(complete == 0 && input_read_offset != input_write_offset) {
+	while (!complete && input_read_offset != input_write_offset) {
 		UINT8 kc = inputBuffer[input_read_offset];
 		++input_read_offset;
-		if(input_read_offset >= BUF_SIZE) input_read_offset = 0;
+		if (input_read_offset >= BUF_SIZE) 
+			input_read_offset = 0;
 
 		kp.info = 0;
         if(kc == KEY_ALT) {
-            if(release == 1) alt = 0;
-            else alt = 1;
+			alt = release ? 0 : 1;
         }
         else if(kc == KEY_CTRL) {
-            if(release == 1) ctrl = 0;
-            else ctrl = 1;
+			ctrl = release ? 0 : 1;
         }
         else if(kc == KEY_SHIFT) {
-            if(release == 1) shift = 0;
-            else shift = 1;
+			shift = release ? 0 : 1;
         }
         else if(kc == KEY_CAPS_LOCK) {
-            if(release == 0) caps = 1-caps;
+            caps = release ? 1-caps : caps;
         }
 		else if(kc < 0x70) {
             // Regular character
@@ -201,14 +206,16 @@ static void process_keypress() {
 			release = 1;
 		}
 	}
-	if(complete != 0) {
+	if (complete) {
 		outputBuffer[output_write_offset] = kp;
 		++output_write_offset;
-		if(output_write_offset >= BUF_SIZE) output_write_offset = 0;
+		if (output_write_offset >= BUF_SIZE) 
+			output_write_offset = 0;
 	}
 }
 
 __attribute__((interrupt)) static void kb_isr(struct interrupt_frame* frame) {
+	
 	UINT8 kc = inb(PS2_DATA_REG);
 	inputBuffer[input_write_offset] = kc;
 	++input_write_offset;
@@ -251,7 +258,7 @@ static void init_pic() {
 
 static void inline mask_pic(UINT8 irq) {
 
-	if(irq < 8) {
+	if (irq < 8) {
 		UINT8 cmask = inb(PIC1_DATA);
 		cmask |= 1<<irq;
 		outb(PIC1_DATA, cmask);
@@ -276,8 +283,9 @@ static void inline umask_pic(UINT8 irq) {
 }
 
 static int init_kb() {
+	
 	int retval = -1;
-	if(check_kb() == 0) {
+	if (!check_kb()) {
 		//Disable PS/2 controller translation
 		outb(PS2_STATUS_REG, PS2_READ_CCB);
 		UINT8 res = readb();
@@ -288,7 +296,7 @@ static int init_kb() {
 		sendb(KB_SET_SCAN_CODE);
 		sendb(KB_SCAN_CODE_2);
 		res = readb();
-		if(res == KB_ACK) {
+		if (res == KB_ACK) {
 			//Enable scan		
 			sendb(KB_SCAN_ENABLE);
 			res = readb();
@@ -317,7 +325,8 @@ static UINT8 read_kc() {
 static keypress read_kb() {
 	keypress kp;
 	kp.info = 1<<7;
-	if(output_read_offset == output_write_offset) process_keypress();
+	if(output_read_offset == output_write_offset) 
+		process_keypress();
 	if(output_read_offset != output_write_offset) {
 		kp = outputBuffer[output_read_offset];
 		++output_read_offset;

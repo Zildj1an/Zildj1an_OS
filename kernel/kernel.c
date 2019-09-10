@@ -17,7 +17,7 @@ int main_k(void){
 	setup_interrupts();
 
 	unsigned char msg[] = "Welcome to Zildj1an-OS\n";
-    unsigned char prompt[] = "ZildOS >";
+   	unsigned char prompt[] = "ZildOS >";
     unsigned char command[MAX_COMMAND];
 
 	cleanScreen();
@@ -27,8 +27,8 @@ int main_k(void){
 
 	while(1){
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
-		read_I((unsigned char*) &command);
-                if(execute_command((unsigned char*) &command) == EXIT_COMMAND) break;
+		read_I((unsigned char*) command);
+        if(execute_command((unsigned char*) command, NULL) == EXIT_COMMAND) break;
 	}
 
  return 0;
