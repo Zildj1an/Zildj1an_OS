@@ -28,7 +28,7 @@ static void init_commands(void){
 	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"EXIT");
     	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Finish the OS session");
 	command_list[EXIT_COMMAND]->id = EXIT_COMMAND;
-	command_list[EXIT_COMMAND]->function = &exit_func();
+        command_list[EXIT_COMMAND]->function = &exit_func();
 }
 
 static int execute_command(unsigned char* command, void *arg){
