@@ -124,13 +124,30 @@ unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 	return ptr;
 }
 
-static inline int is_alpha(char c) {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+
+static char hex_to_char(UINT8 hex) {
+    if(hex < 0xA) return '0'+hex;
+    else return 'A'-10+hex;
+}
+
+static void print_hex(UINT8 kc) {
+    UINT8 fh, sh;
+    fh = kc % 16;
+    sh = kc >> 4;
+    unsigned char buff[] = {hex_to_char(sh),hex_to_char(fh), ' '};
+    write_O((unsigned char *)buff, 3, GREEN);
 }
 
 static void read_I(unsigned char *command){
 
 	int offset = 0;
+    /*
+    while(1) {
+        UINT8 kc = read_kc();
+        if(kc != 0) {
+            print_hex(kc);
+        }
+    }*/
 	keypress kp;
 	do {
 		kp = read_kb();
@@ -147,7 +164,6 @@ static void read_I(unsigned char *command){
 				    if(offset > 0) --offset;
 			    }
 			    else {
-                    if(!is_caps(kp) && is_alpha(kp.c)) kp.c += ('a'-'A');
 				    command[offset] = kp.c;
 				    write_O(command+offset, 1, GREEN);
 				    ++offset;

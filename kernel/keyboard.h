@@ -59,39 +59,46 @@ Issues:
 
 unsigned char keycodes[] = {
 	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 9, '`', 0,	//0x00-0x0F	
-	0, 0, 0, 0, 0, 'Q', '1', 0,
-	0, 0, 'Z', 'S', 'A', 'W', '2', 0,	//0x10-0x1F	
-	0, 'C', 'X', 'D', 'E', '4', '3', 0,
-	0, ' ', 'V', 'F', 'T', 'R', '5', 0,	//0x20-0x2F	
-	0, 'N', 'B', 'H', 'G', 'Y', '6', 0,
-	0, 0, 'M', 'J', 'U', '7', '8', 0,	//0x30-0x3F	
-	0, ',', 'K', 'I', 'O', '0', '9', 0,
-	0, '.', '/', 'L', ';', 'P', '-', 0,	//0x40-0x4F	
-	0, 0, '\'', 0, '[', '=', 0, 0,
-	0, 0, '\n', ']', 0, '\\', 0, 0,		//0x50-0x5F	
-	0, 0, 0, 0, 0, 0, '\b', 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x60-0x6F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x70-0x7F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x80-0x8F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x90-0x9F	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xA0-0xAF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xB0-0xBF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xC0-0xCF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xD0-0xDF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xE0-0xEF	
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0xF0-0xFF	
+	0, 0, 0, 0, 0, '\t', 0, 0,	//0x00-0x0F	
+	0, 0, 0, 0, 0, 'q', '1', 0,
+	0, 0, 'z', 's', 'a', 'w', '2', 0,	//0x10-0x1F	
+	0, 'c', 'x', 'd', 'e', '4', '3', 0,
+	0, ' ', 'v', 'f', 't', 'r', '5', 0,	//0x20-0x2F	
+	0, 'n', 'b', 'h', 'g', 'y', '6', 0,
+	0, 0, 'm', 'j', 'u', '7', '8', 0,	//0x30-0x3F	
+	0, ',', 'k', 'i', 'o', '0', '9', 0,
+	0, '.', '-', 'l', ';', 'p', '\'', 0,	//0x40-0x4F	
+	0, 0, '\'', 0, '\'', '`', 0, 0,
+	0, 0, '\n', '+', 0, 0, 0, 0,		//0x50-0x5F	
+	0, '<', 0, 0, 0, 0, '\b', 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x60-0x6F	
 };
 
+unsigned char keycodes_shift[] = {
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, '\t', 0, 0,	//0x00-0x0F	
+	0, 0, 0, 0, 0, 'Q', '!', 0,
+	0, 0, 'Z', 'S', 'A', 'W', '"', 0,	//0x10-0x1F	
+	0, 'C', 'X', 'D', 'E', '$', 0, 0,
+	0, ' ', 'V', 'F', 'T', 'R', '%', 0,	//0x20-0x2F	
+	0, 'N', 'B', 'H', 'G', 'Y', '&', 0,
+	0, 0, 'M', 'J', 'U', '/', '(', 0,	//0x30-0x3F	
+	0, ';', 'K', 'I', 'O', '=', ')', 0,
+	0, ':', '_', 'L', ';', 'P', '?', 0,	//0x40-0x4F	
+	0, 0, '"', 0, 0, '^', 0, 0,
+	0, 0, '\n', '*', 0, 0, 0, 0,		//0x50-0x5F	
+	0, '>', 0, 0, 0, 0, '\b', 0, 0, 0, 0, 0, 0, 0, 0, 0,	//0x60-0x6F	
+};
 
 /*
 Represents a key press (or release). c is the ASCII character of the key.
 The bits in info represent the following:
     Bit     Meaning
     0       0 for key press, 1 for key release
-    1       Caps (1 = enabled)
+    1       Caps lock enabled
     2       Ctrl pressed
     3       Alt pressed
-    4-6     Unused
+    4       Shift pressed
+    5-6     Unused
     7       0 if this is a valid keypress (a 1 here usually means that there are no
             keypresses in the output buffer)    
 */
@@ -104,7 +111,11 @@ static inline int is_released(keypress kp) {return kp.info & 1;}
 static inline int is_caps(keypress kp) {return kp.info & (1<<1);}
 static inline int is_ctrl(keypress kp) {return kp.info & (1<<2);}
 static inline int is_alt(keypress kp) {return kp.info & (1<<3);}
+static inline int is_shift(keypress kp) {return kp.info & (1<<4);}
 static inline int is_valid(keypress kp) {return !(kp.info & (1<<7));}
+static inline int is_alpha(char c) {
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+}
 
 
 static UINT8 inputBuffer[BUF_SIZE];
@@ -116,7 +127,12 @@ static UINT8 caps = 0, ctrl = 0, alt = 0, shift = 0;
 
 
 static char fromKeycode(UINT8 kc) {
-	return keycodes[kc];
+    char c;
+    if(shift) c = keycodes_shift[kc];
+	else c = keycodes[kc];
+    if(is_alpha(c))
+      c += caps*(shift*('a'-'A') + !shift*('A'-'a'));
+    return c;
 }
 
 static int sendb(UINT8 data) {
@@ -172,13 +188,12 @@ static void process_keypress() {
             else shift = 1;
         }
         else if(kc == KEY_CAPS_LOCK) {
-            if(release == 1) caps = 0;
-            else caps = 1;
+            if(release == 0) caps = 1-caps;
         }
 		else if(kc < 0x70) {
             // Regular character
 			kp.c = fromKeycode(kc);
-			kp.info = release | (caps^shift)<<1 | ctrl<<2 | alt<<3;
+			kp.info = release | caps<<1 | ctrl<<2 | alt<<3 | shift<<4;
 			release = 0;
 			complete = 1;
 		}
@@ -287,6 +302,16 @@ static int init_kb() {
 		}
 	}
 	return retval;
+}
+
+static UINT8 read_kc() {
+    UINT8 kc = 0;
+    if(input_read_offset != input_write_offset) {
+        kc = inputBuffer[input_read_offset];
+        ++input_read_offset;
+		if(input_read_offset >= BUF_SIZE) input_read_offset = 0;
+    }
+    return kc;
 }
 
 static keypress read_kb() {
