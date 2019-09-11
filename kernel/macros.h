@@ -29,10 +29,14 @@ typedef int COLOR;
 #define EINVAL 2
 
 /* Commands*/
-#define MAX_COMMAND 30
-#define NUM_COMMANDS 2
-#define EXIT_COMMAND 0
-#define ECHO_COMMAND 1
+#define MAX_COMMAND      30
+#define NUM_COMMANDS     5
+#define EXIT_COMMAND     0
+#define ECHO_COMMAND     1
+#define MAN_COMMAND      2
+#define LS_COMMAND       3
+#define PVS_COMMAND      4
+#define ZCHANNEL_COMMAND 5
 
 typedef unsigned char UINT8;
 typedef unsigned int UINT32;

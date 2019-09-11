@@ -24,6 +24,11 @@ void inline echo_func(char *msg){
 
  	write_O((unsigned char*) &msg, sizeof(msg), RED);
 }
+
+void inline zchannel_func(void *arg){}
+void inline pvs_func(char *msg){}
+void inline ls_func(void *arg){}
+void inline man_func(char *msg){}
 void inline exit_func(void *arg){}
 
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
@@ -31,7 +36,7 @@ void inline exit_func(void *arg){}
    Important commands to do:
       0. echo (requires dividing the command in parts @ execute_command)
       1. Man or help for displaying commands description
-      2. ls or dir (First we need to take care of the file system)
+      2. ls or dir (First we need to take care of the file system and managing)
       3. Providing echo w the possibility to display GLOBAL VARIABLES
       4. Command p-vs will execute scripts in the language p-vslang
          This will be very costly as we need an interpreter of loops and other structures
@@ -40,6 +45,8 @@ void inline exit_func(void *arg){}
                         We can implement a socket that -by now- will work assuming
                         all ZildOs users are connected to Eduroam. Probably will be able
                         to see results with this by summer or later
+                        Z-CHANNEL COULD BE USED TO EXCHANGE p-vslang FILES
+      6. ?
 */
 static void init_commands(void){
 
@@ -52,7 +59,30 @@ static void init_commands(void){
         strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Display a message on screen");
         /* TODO: Echo could also display GLOBAL ENVIRONMENT VARIABLES SO WE CAN DO SCRIPTS */
         command_list[EXIT_COMMAND]->id = ECHO_COMMAND;
-        command_list[EXIT_COMMAND]->function = echo_func;
+        command_list[EXIT_COMMAND]->function = &echo_func;
+
+        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"man");
+        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Help about commands");
+        command_list[EXIT_COMMAND]->id = MAN_COMMAND;
+        command_list[EXIT_COMMAND]->function = &man_func;
+
+        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"ls");
+        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Display folder contents");
+        /* TODO: File System */
+        command_list[EXIT_COMMAND]->id = LS_COMMAND;
+        command_list[EXIT_COMMAND]->function = &ls_func;
+
+        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"p-vs");
+        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Execute scripts in the language p-vslang");
+        /*TODO: Interpreter*/
+        command_list[EXIT_COMMAND]->id = PVS_COMMAND;
+        command_list[EXIT_COMMAND]->function = &pvs_func;
+
+        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"zchannel");
+        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Connect to the IRC-channel");
+        /* TODO: A big todo */
+        command_list[EXIT_COMMAND]->id = ZCHANNEL_COMMAND;
+        command_list[EXIT_COMMAND]->function = &zchannel_func;
 }
 
 static int execute_command(unsigned char* command, void *arg){
