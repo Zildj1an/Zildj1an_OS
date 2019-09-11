@@ -30,9 +30,9 @@ typedef int COLOR;
 
 /* Commands*/
 #define MAX_COMMAND 30
-#define NUM_COMMANDS 1
+#define NUM_COMMANDS 2
 #define EXIT_COMMAND 0
-
+#define ECHO_COMMAND 1
 
 typedef unsigned char UINT8;
 typedef unsigned int UINT32;

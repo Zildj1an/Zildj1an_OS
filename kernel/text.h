@@ -101,19 +101,19 @@ static inline void cleanScreen(void){
 
 static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int size_a, unsigned int size_b){
 
-	unsigned int i;
+    unsigned int i;
     if (size_a != size_b) return -EINVAL;
     for (i = 0; i < size_a && a[i] == b[i] && a[i] != '\0'; ++i){}
-
+    return (i == size_a);
 }
 
 // Function to implement strcpy() function
 unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 
 	unsigned char *ptr;
-		
+
 	// return if no memory is allocated to the destination
-	if (destination == NULL)
+	if (!destination)
 		return NULL;
 
 	ptr = destination;
@@ -181,7 +181,7 @@ static void read_I(unsigned char *command){
 	}
     else
         command[offset-1] = '\0';
-	return;
+    return;
 }
 
 #endif
