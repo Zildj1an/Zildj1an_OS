@@ -44,7 +44,7 @@ void inline exit_func(void *arg){}
       5. z-channel -> This is going to be last but fucking amazing.
                         We can implement a socket that -by now- will work assuming
                         all ZildOs users are connected to Eduroam. Probably will be able
-                        to see results with this by summer or later
+                        to see results within this by summer or later
                         Z-CHANNEL COULD BE USED TO EXCHANGE p-vslang FILES
       6. ?
 */
@@ -55,34 +55,34 @@ static void init_commands(void){
 	command_list[EXIT_COMMAND]->id = EXIT_COMMAND;
 	command_list[EXIT_COMMAND]->function = &exit_func;
 
-        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"echo");
-        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Display a message on screen");
-        /* TODO: Echo could also display GLOBAL ENVIRONMENT VARIABLES SO WE CAN DO SCRIPTS */
-        command_list[EXIT_COMMAND]->id = ECHO_COMMAND;
-        command_list[EXIT_COMMAND]->function = &echo_func;
+	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"echo");
+	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Display a message on screen");
+	/* TODO: Echo could also display GLOBAL ENVIRONMENT VARIABLES SO WE CAN DO SCRIPTS */
+	command_list[EXIT_COMMAND]->id = ECHO_COMMAND;
+	command_list[EXIT_COMMAND]->function = &echo_func;
 
-        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"man");
-        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Help about commands");
-        command_list[EXIT_COMMAND]->id = MAN_COMMAND;
-        command_list[EXIT_COMMAND]->function = &man_func;
+	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"man");
+	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Help about commands");
+	command_list[EXIT_COMMAND]->id = MAN_COMMAND;
+	command_list[EXIT_COMMAND]->function = &man_func;
 
-        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"ls");
-        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Display folder contents");
-        /* TODO: File System */
-        command_list[EXIT_COMMAND]->id = LS_COMMAND;
-        command_list[EXIT_COMMAND]->function = &ls_func;
+	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"ls");
+	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Display folder contents");
+	/* TODO: File System */
+	command_list[EXIT_COMMAND]->id = LS_COMMAND;
+	command_list[EXIT_COMMAND]->function = &ls_func;
 
-        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"p-vs");
-        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Execute scripts in the language p-vslang");
-        /*TODO: Interpreter*/
-        command_list[EXIT_COMMAND]->id = PVS_COMMAND;
-        command_list[EXIT_COMMAND]->function = &pvs_func;
+	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"p-vs");
+	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Execute scripts in the language p-vslang");
+	/*TODO: Interpreter*/
+	command_list[EXIT_COMMAND]->id = PVS_COMMAND;
+	command_list[EXIT_COMMAND]->function = &pvs_func;
 
-        strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"zchannel");
-        strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Connect to the IRC-channel");
-        /* TODO: A big todo */
-        command_list[EXIT_COMMAND]->id = ZCHANNEL_COMMAND;
-        command_list[EXIT_COMMAND]->function = &zchannel_func;
+	strcpy(command_list[EXIT_COMMAND]->name,(unsigned char*)"zchannel");
+	strcpy(command_list[EXIT_COMMAND]->description,(unsigned char*)"Connect to the IRC-channel");
+	/* TODO: A big todo */
+	command_list[EXIT_COMMAND]->id = ZCHANNEL_COMMAND;
+	command_list[EXIT_COMMAND]->function = &zchannel_func;
 }
 
 static int execute_command(unsigned char* command, void *arg){
