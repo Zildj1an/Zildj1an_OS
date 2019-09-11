@@ -30,7 +30,7 @@ typedef int COLOR;
 
 /* Commands*/
 #define MAX_COMMAND      30
-#define NUM_COMMANDS     5
+#define NUM_COMMANDS     6
 #define EXIT_COMMAND     0
 #define ECHO_COMMAND     1
 #define MAN_COMMAND      2
