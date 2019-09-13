@@ -17,22 +17,22 @@ int main_k(void){
 	setup_interrupts();
 
 	unsigned char msg[]      = "Welcome to Zildj1an-OS\n";
-   	unsigned char prompt[]   = "ZildOS >";
-        unsigned char exit_msg[] = "Good bye!\n";
-        unsigned char command[MAX_COMMAND];
+	unsigned char prompt[]   = "ZildOS >";
+	unsigned char exit_msg[] = "Good bye!\n";
+	unsigned char command[MAX_COMMAND];
 
 	cleanScreen();
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
-        init_commands();
-        init_kb();
+	init_commands();
+	init_kb();
 
 	while(1){
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
 		read_I((unsigned char*) command);
-                if(execute_command((unsigned char*) command, NULL) == EXIT_COMMAND){
-		   write_O((unsigned char*) &exit_msg, sizeof(exit_msg), BLUE);
-                   break;
-	        }
+		if(execute_command((unsigned char*) command, NULL) == EXIT_COMMAND){
+			write_O((unsigned char*) &exit_msg, sizeof(exit_msg), BLUE);
+			break;
+		}
 	}
 
  return 0;

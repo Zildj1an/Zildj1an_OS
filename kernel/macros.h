@@ -21,8 +21,44 @@
 #define ROW_TEXT 25
 #define COLUMN_TEXT 80
 
+/* Interrupts */
+#define GDTD_SEGMENT_GRANULARITY_4KB 1<<7
+#define GDTD_SEGMENT_SIZE_32 1<<6
+#define GDTD_CODESEG_ACCESS 0x9A
+#define GDTD_DATASEG_ACCESS 0x92
+
+#define GATE_TYPE_INT_32 0b10001111
+
+#define PIC1		0x20
+#define PIC2		0xA0
+#define PIC1_COMMAND	PIC1
+#define PIC1_DATA	(PIC1+1)
+#define PIC2_COMMAND	PIC2
+#define PIC2_DATA	(PIC2+1)
+#define PIC_EOI		0x20
+#define PIC1_IRQ_OFFSET 0x40 
+#define PIC2_IRQ_OFFSET 0x48
+#define PIC_INITIALIZE 0x11
+#define PIC_KB_IRQ 1
+
+/* Keyboard */
+#define PS2_STATUS_REG (UINT16) 0x64
+#define PS2_DATA_REG (UINT16) 0x60
+#define PS2_READ_CCB 0x20
+#define PS2_WRITE_CCB 0x60
+#define PS2_TRANSLATION_BIT 6
+
+#define KB_ACK (UINT8) 0xFA
+#define KB_ECHO (UINT8) 0xEE
+#define KB_SCAN_ENABLE (UINT8) 0xF4
+#define KB_SET_SCAN_CODE (UINT8) 0xF0
+#define KB_SCAN_CODE_2 (UINT8) 0x02
+
+
 typedef int size_t;
 typedef unsigned short UINT16;
+typedef unsigned char UINT8;
+typedef unsigned int UINT32;
 typedef int COLOR;
 
 /* Return values errors */
@@ -38,7 +74,5 @@ typedef int COLOR;
 #define PVS_COMMAND      4
 #define ZCHANNEL_COMMAND 5
 
-typedef unsigned char UINT8;
-typedef unsigned int UINT32;
 
 #endif

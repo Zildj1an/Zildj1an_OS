@@ -63,8 +63,8 @@ static int replace_O(unsigned char* msg, size_t count, COLOR color) {
 
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 	ret = write_O(msg, count, color);
-	
-    return ret;
+
+	return ret;
 }
 
 static int delete_O(size_t count) {
@@ -80,10 +80,24 @@ static int delete_O(size_t count) {
 
 	if (positionX < count) 
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
-	
+
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 
 	return ret;
+}
+
+static char hex_to_char(UINT8 hex) {
+	if(hex < 0xA) return '0'+hex;
+	else return 'A'-10+hex;
+}
+
+static void print_hex(UINT8 kc) {
+	// For debugging purposes
+	UINT8 fh, sh;
+	fh = kc % 16;
+	sh = kc >> 4;
+	unsigned char buff[] = {hex_to_char(sh),hex_to_char(fh), ' '};
+	write_O((unsigned char *)buff, 3, GREEN);
 }
 
 static inline void cleanScreen(void){
@@ -101,10 +115,10 @@ static inline void cleanScreen(void){
 
 static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int size_a, unsigned int size_b){
 
-    unsigned int i;
-    if (size_a != size_b) return -EINVAL;
-    for (i = 0; i < size_a && a[i] == b[i] && a[i] != '\0'; ++i){}
-    return (i == size_a);
+	unsigned int i;
+	if (size_a != size_b) return -EINVAL;
+	for (i = 0; i < size_a && a[i] == b[i] && a[i] != '\0'; ++i){}
+	return (i == size_a || (b[i] == '\0' && a[i] == '\0') );
 }
 
 // Function to implement strcpy() function
@@ -129,59 +143,44 @@ unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 	return ptr;
 }
 
-static char hex_to_char(UINT8 hex) {
-    if(hex < 0xA) return '0'+hex;
-    else return 'A'-10+hex;
-}
-
-static void print_hex(UINT8 kc) {
-    // For debugging purposes
-    UINT8 fh, sh;
-    fh = kc % 16;
-    sh = kc >> 4;
-    unsigned char buff[] = {hex_to_char(sh),hex_to_char(fh), ' '};
-    write_O((unsigned char *)buff, 3, GREEN);
-}
 
 static void read_I(unsigned char *command){
 
-    //Returns size of command
+	//Returns size of command
 
 	int offset = 0;
-	keypress kp;
+	struct keypress kp;
 	
 	do {
 		kp = read_kb();
 		if (is_valid(kp) && !is_released(kp)) {
 			
-		    if (is_ctrl(kp)) {
+			if (is_ctrl(kp)) {
 			//Ctrl+<>
-		    }
-		    else if(is_alt(kp)) {
+			} else if(is_alt(kp)) {
 			//Alt+<>
-		    }
-            else {
-			    if (kp.c == '\b') {
-				    delete_O(1); //TODO add Ctr + K (?)
-				    if(offset > 0) --offset;
-			    }
-			    else {
-				    command[offset] = kp.c;
-				    write_O(command+offset, 1, GREEN);
-				    ++offset;
-			    }
-            }
+			} else {
+				if (kp.c == '\b') {
+					delete_O(1); //TODO add Ctr + K (?)
+					if(offset > 0) --offset;
+				} else {
+					command[offset] = kp.c;
+					write_O(command+offset, 1, GREEN);
+					++offset;
+				}
+			}
 		}
 	} while ((kp.c != '\n' || is_released(kp)) && offset < MAX_COMMAND-1);
 
 	if (command[offset-1] != '\n') {
 		char c = '\n';
 		write_O((unsigned char*)&c, 1, GREEN);
-        command[offset] = '\0';
+		command[offset] = '\0';
 	}
-    else
-        command[offset-1] = '\0';
-    return;
+	else {
+		command[offset-1] = '\0';
+	}
+	return;
 }
 
 #endif

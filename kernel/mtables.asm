@@ -23,10 +23,10 @@ section .text
 	
 load_gdt:			; Note that interrupts were already disabled in start.asm
 	mov eax, [esp + 4]	; Set address (first arg)
-   	mov [gdt_desc + 2], eax
-   	mov ax, [esp + 8]	; Set size (second arg)
-   	mov [gdt_desc], ax
-   	lgdt [gdt_desc]
+	mov [gdt_desc + 2], eax
+	mov ax, [esp + 8]	; Set size (second arg)
+	mov [gdt_desc], ax
+	lgdt [gdt_desc]
 	ret
 
 reload_segments:		; Set segment registers to our new GDT selectors
@@ -43,9 +43,9 @@ reload_CS:
 
 load_idt:
 	mov eax, [esp + 4]	; Set address (first arg)
-   	mov [idt_desc + 2], eax
-   	mov ax, [esp + 8]	; Set size (second arg)
-   	mov [idt_desc], ax
-   	lidt [idt_desc]
+	mov [idt_desc + 2], eax
+	mov ax, [esp + 8]	; Set size (second arg)
+	mov [idt_desc], ax
+	lidt [idt_desc]
 	sti			; We can now enable interruptions
 	ret
