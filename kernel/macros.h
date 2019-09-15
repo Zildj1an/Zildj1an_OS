@@ -7,6 +7,13 @@
 #ifndef _MACROS_H_
 #define _MACROS_H_
 
+typedef int size_t;
+typedef unsigned short UINT16;
+typedef unsigned char UINT8;
+typedef unsigned int UINT32;
+typedef unsigned long UINT64;
+typedef int COLOR;
+
 #define NULL 0
 
 /* VGA Colors */
@@ -54,26 +61,25 @@
 #define KB_SET_SCAN_CODE (UINT8) 0xF0
 #define KB_SCAN_CODE_2 (UINT8) 0x02
 
+/* Memory */
+#define BLOCK_SIZE 1024
+#define MINIMUM_MEM (UINT32)(1<<24) //16 MiB
+#define MEM_SAFE_DISTANCE (UINT32)(1<<20) //1MiB
 
-typedef int size_t;
-typedef unsigned short UINT16;
-typedef unsigned char UINT8;
-typedef unsigned int UINT32;
-typedef unsigned long UINT64;
-typedef int COLOR;
 
 /* Return values errors */
 #define EINVAL 2
 
 /* Commands*/
-#define MAX_COMMAND      30
-#define NUM_COMMANDS     6
+#define MAX_COMMAND      60
+#define NUM_COMMANDS     7
 #define EXIT_COMMAND     0
 #define ECHO_COMMAND     1
 #define MAN_COMMAND      2
 #define LS_COMMAND       3
 #define PVS_COMMAND      4
 #define ZCHANNEL_COMMAND 5
+#define CLEAR_COMMAND 6
 
 
 #endif

@@ -22,12 +22,18 @@ struct command {
 struct command command_list[NUM_COMMANDS];
 
 void echo_func(struct Array *arg){
+
 	unsigned char *msg;
-	size_t size = get_arg(0, arg->data, &msg);
-	if (size > 0) 
-		write_O((unsigned char*) msg+size + 1,
-			(unsigned char *) arg->size - (msg - (unsigned char *)arg->data)
-			- size - 1, RED);
+	size_t csize = get_arg(0, arg->data, &msg);
+	size_t argsize;
+	if (csize > 0) {
+		argsize = arg->size - (msg - (unsigned char *)arg->data) - csize - 1;
+		write_O((unsigned char*) msg+csize + 1, argsize, RED);
+	}
+}
+
+static inline void clear_func(struct Array *arg){
+	cleanScreen();
 }
 
 void zchannel_func(struct Array *arg){}
@@ -61,6 +67,13 @@ static void init_commands(void){
 
 	command_list[EXIT_COMMAND].id = EXIT_COMMAND;
 	command_list[EXIT_COMMAND].function = &exit_func;
+
+	strcpy(command_list[CLEAR_COMMAND].name,(unsigned char*)"clear");
+	strcpy(command_list[CLEAR_COMMAND].description,
+			(unsigned char*)"Clear screen");
+
+	command_list[CLEAR_COMMAND].id = CLEAR_COMMAND;
+	command_list[CLEAR_COMMAND].function = &clear_func;
 
 	strcpy(command_list[ECHO_COMMAND].name,(unsigned char*)"echo");
 	strcpy(command_list[ECHO_COMMAND].description,
@@ -112,11 +125,15 @@ static int execute_command(struct Array *command){
 
 	cmdsize = get_arg(0, command->data, &cmd);
 
-	for (i = 0; i < NUM_COMMANDS; ++i){;
-		if (equal_str(cmd,command_list[i].name, cmdsize,cmdsize) > 0 && (cmd[cmdsize] == ' ' || cmd[cmdsize] == '\n')) {
-			id = command_list[i].id;
-			command_list[i].function(command);
-			i = NUM_COMMANDS;
+	if (cmdsize > 0) {
+		for (i = 0; i < NUM_COMMANDS; ++i){;
+			if (equal_str(cmd,command_list[i].name, cmdsize,cmdsize) > 0
+				&& (cmd[cmdsize] == ' ' || cmd[cmdsize] == '\n')) {
+
+				id = command_list[i].id;
+				command_list[i].function(command);
+				i = NUM_COMMANDS;
+			}
 		}
 	}
 

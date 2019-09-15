@@ -22,6 +22,21 @@ static inline int invalid_color(COLOR color){
 	  && color != BROWN && color != WHITE);
 }
 
+static void scroll_half() {
+
+	unsigned int i, j;
+	for (i = ROW_TEXT/2; i < ROW_TEXT; ++i) {
+		for (j = 0; j < COLUMN_TEXT; ++j) {
+			SCREEN_BUFFER[j + (i-ROW_TEXT/2)*COLUMN_TEXT] = 
+				SCREEN_BUFFER[j + i*COLUMN_TEXT];
+			
+			SCREEN_BUFFER[j + i*COLUMN_TEXT] = ' ';
+		}
+		
+	}
+	positionY -= ROW_TEXT/2;
+}
+
 /* For now we assume stdout as Output */
 static int write_O(unsigned char* msg, size_t count, COLOR color) {
 
@@ -35,7 +50,7 @@ static int write_O(unsigned char* msg, size_t count, COLOR color) {
 		goto end;
 	 }
 
-	 for (i = 0; i < count; ++i) {
+	 for (i = 0; i < count && msg[i] != '\0'; ++i) {
 
 		if(*(msg + i) == '\n') goto line;
 
@@ -46,13 +61,16 @@ static int write_O(unsigned char* msg, size_t count, COLOR color) {
 		if (positionX == COLUMN_TEXT - 1){
 
 line:			positionX = 0;
-			positionY = (positionY + 1) % (ROW_TEXT - 1);
+			positionY = (positionY + 1);
+			if (positionY > ROW_TEXT-2)
+				scroll_half();
 		}
 	}
 
 end:
 	return ret;
 }
+
 
 static inline char hex_to_char(UINT8 hex) {
 

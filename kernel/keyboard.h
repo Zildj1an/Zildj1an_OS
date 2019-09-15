@@ -69,7 +69,7 @@ unsigned char keycodes_shift[] = {
  *	3	Alt pressed
  *	4	Shift pressed
  *	5-6	Unused
- *	7	0 if this is a valid struct keypress (a 1 here usually means that there are no
+ *	7	0 if this is a valid keypress (a 1 here usually means that there are no
  *		struct keypresses in the output buffer)
  */
 struct keypress {
@@ -166,6 +166,8 @@ static void proc_kp() {
 			kp.info = release | caps<<1 | ctrl<<2 | alt<<3 | shift<<4;
 			release = 0;
 			complete = 1;
+			if (!kp.c)
+				kp.info |= (1<<7);
 		} else if(kc == KEY_RELEASED) {
 			release = 1;
 		}
