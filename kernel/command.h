@@ -9,27 +9,32 @@
 
 #include "macros.h"
 #include "text.h"
+#include "array.h"
 
 struct command {
 
 	unsigned char name[MAX_COMMAND];
 	unsigned char description[MAX_COMMAND];
 	unsigned int id;
-	void (*function)(void *arg);
+	void (*function)(struct Array *arg);
 };
 
 struct command command_list[NUM_COMMANDS];
 
-void echo_func(char *msg){
-
-	write_O((unsigned char*) &msg, sizeof(msg), RED);
+void echo_func(struct Array *arg){
+	unsigned char *msg;
+	size_t size = get_arg(0, arg->data, &msg);
+	if (size > 0) 
+		write_O((unsigned char*) msg+size + 1,
+			(unsigned char *) arg->size - (msg - (unsigned char *)arg->data)
+			- size - 1, RED);
 }
 
-void zchannel_func(void *arg){}
-void pvs_func(char *msg){}
-void ls_func(void *arg){}
-void man_func(char *msg){}
-void exit_func(void *arg){}
+void zchannel_func(struct Array *arg){}
+void pvs_func(struct Array *arg){}
+void ls_func(struct Array *arg){}
+void man_func(struct Array *arg){}
+void exit_func(struct Array *arg){}
 
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
 
@@ -63,14 +68,14 @@ static void init_commands(void){
 
 	// TODO: Echo could also display GLOBAL ENVIRONMENT VARIABLES SO WE CAN DO SCRIPTS
 	command_list[ECHO_COMMAND].id = ECHO_COMMAND;
-	command_list[ECHO_COMMAND].function = (void *)(void *) &echo_func;
+	command_list[ECHO_COMMAND].function = &echo_func;
 
 	strcpy(command_list[MAN_COMMAND].name,(unsigned char*)"man");
 	strcpy(command_list[MAN_COMMAND].description,
 			(unsigned char*)"Help about commands");
 
 	command_list[MAN_COMMAND].id = MAN_COMMAND;
-	command_list[MAN_COMMAND].function = (void *)(void *) &man_func;
+	command_list[MAN_COMMAND].function = &man_func;
 
 	strcpy(command_list[LS_COMMAND].name,(unsigned char*)"ls");
 	strcpy(command_list[LS_COMMAND].description,
@@ -86,7 +91,7 @@ static void init_commands(void){
 
 	// TODO: Interpreter
 	command_list[PVS_COMMAND].id = PVS_COMMAND;
-	command_list[PVS_COMMAND].function = (void *)(void *) &pvs_func;
+	command_list[PVS_COMMAND].function = &pvs_func;
 
 	strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"zchannel");
 	strcpy(command_list[ZCHANNEL_COMMAND].description,
@@ -97,18 +102,20 @@ static void init_commands(void){
 	command_list[ZCHANNEL_COMMAND].function = &zchannel_func;
 }
 
-static int execute_command(unsigned char* command, void *arg){
+static int execute_command(struct Array *command){
 
 	unsigned int i;
 	int id = -1;
 	unsigned char error_msg[] = "Error with the given command!\n";
-	for (i = 0; i < NUM_COMMANDS; ++i){
-		size_t sc = sizeof(command), sn = sizeof(command_list[i].name);
-		size_t size = sc > sn ? sn : sc;
-		// TODO divide command and args in char command
-		if (equal_str(command,command_list[i].name, size,size) > 0) {
+	unsigned char *cmd;
+	unsigned int cmdsize;
+
+	cmdsize = get_arg(0, command->data, &cmd);
+
+	for (i = 0; i < NUM_COMMANDS; ++i){;
+		if (equal_str(cmd,command_list[i].name, cmdsize,cmdsize) > 0 && (cmd[cmdsize] == ' ' || cmd[cmdsize] == '\n')) {
 			id = command_list[i].id;
-			command_list[i].function(arg);
+			command_list[i].function(command);
 			i = NUM_COMMANDS;
 		}
 	}

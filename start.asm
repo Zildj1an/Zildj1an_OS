@@ -23,6 +23,7 @@ section .text
 start_k:
 	cli		; Clean interrupts
 	mov esp,stack
+	push ebx
 	; start C code
 	call main_k
 	; we shouldn't return

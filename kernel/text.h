@@ -4,6 +4,7 @@
 #include "macros.h"
 #include "keyboard.h"
 #include "io.h"
+#include "array.h"
 
 UINT16* SCREEN_BUFFER;
 
@@ -53,15 +54,38 @@ end:
 	return ret;
 }
 
-static int replace_O(unsigned char* msg, size_t count, COLOR color) {
+static inline char hex_to_char(UINT8 hex) {
+
+	if(hex < 0xA) return '0'+hex;
+	else return 'A'-10+hex;
+}
+
+static void print_hex(UINT32 kc) {
+
+	// For debugging purposes
+	unsigned char buff[9];
+	unsigned int i;
+	for(i = 0; i < 8; i += 2) {
+		UINT8 fh, sh;
+		fh = kc & 0xF;
+		sh = (kc >> 4) & 0xF;
+		kc = kc >> 8;
+		buff[8-i-2] = hex_to_char(sh);
+		buff[8-i-1] = hex_to_char(fh);
+	}
+	buff[8] = ' ';
+	write_O((unsigned char *)buff, 9, GREEN);
+}
+
+static int replace_O(unsigned char* msg, int count, COLOR color) {
 
 	int ret;
-	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
-
-	if (positionX < count)
+	positionY = (ROW_TEXT - 1 + positionY - count/(COLUMN_TEXT)) % (ROW_TEXT-1);
+	
+	if (positionX < count%(COLUMN_TEXT-1))
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
-
-	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
+	
+	positionX = (COLUMN_TEXT-1 + positionX - (count%COLUMN_TEXT)) % (COLUMN_TEXT-1);
 	ret = write_O(msg, count, color);
 
 	return ret;
@@ -80,25 +104,11 @@ static int delete_O(size_t count) {
 
 	if (positionX < count) 
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
-
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 
 	return ret;
 }
 
-static char hex_to_char(UINT8 hex) {
-	if(hex < 0xA) return '0'+hex;
-	else return 'A'-10+hex;
-}
-
-static void print_hex(UINT8 kc) {
-	// For debugging purposes
-	UINT8 fh, sh;
-	fh = kc % 16;
-	sh = kc >> 4;
-	unsigned char buff[] = {hex_to_char(sh),hex_to_char(fh), ' '};
-	write_O((unsigned char *)buff, 3, GREEN);
-}
 
 static inline void cleanScreen(void){
 
@@ -118,7 +128,7 @@ static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int siz
 	unsigned int i;
 	if (size_a != size_b) return -EINVAL;
 	for (i = 0; i < size_a && a[i] == b[i] && a[i] != '\0'; ++i){}
-	return (i == size_a || (b[i] == '\0' && a[i] == '\0') );
+	return (i == size_a || (b[i] == '\0' && a[i] == '\0'));
 }
 
 // Function to implement strcpy() function
@@ -143,12 +153,44 @@ unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 	return ptr;
 }
 
+/**
+ * Returns a pointer to the argnum argument in command, stored in arg,
+ * and the size of the argument, or 0 if there are less than argnum arguments
+ */
+static size_t get_arg(int argnum, unsigned char *command, unsigned char **arg) {
 
-static void read_I(unsigned char *command){
+	UINT8 i = 0;
+	UINT8 num = -1;
+	UINT8 found = 0;
+	UINT8 prev = 1;
+	size_t size = 0;
+
+	*arg = command;
+ 	do {
+		if (num == argnum && (command[i] == ' ' || command[i] == '\n')) {
+			found = 1;
+			size = command+i-*arg;
+		} else {
+			if (command[i] == ' ' && !prev) {
+				prev = 1;				
+			} else if (command[i] != ' ' && prev) { 
+				prev = 0;
+				*arg = command+i;
+				++num;
+			}
+		}	
+		++i;
+	} while (!found && command[i] != '\0');
+
+	return size;
+}
+
+static void read_I(struct Array *command){
 
 	//Returns size of command
 
 	int offset = 0;
+	unsigned char *buff = (unsigned char *) command->data;
 	struct keypress kp;
 	
 	do {
@@ -161,25 +203,22 @@ static void read_I(unsigned char *command){
 			//Alt+<>
 			} else {
 				if (kp.c == '\b') {
-					delete_O(1); //TODO add Ctr + K (?)
-					if(offset > 0) --offset;
-				} else {
-					command[offset] = kp.c;
-					write_O(command+offset, 1, GREEN);
+					if (offset > 0) {
+						delete_O(1); //TODO add Ctr + K (?)
+						--offset;
+					}
+				} else if (offset < MAX_COMMAND - 2 || kp.c == '\n') {
+					buff[offset] = kp.c;
+					write_O(buff+offset, 1, GREEN);
 					++offset;
 				}
 			}
 		}
-	} while ((kp.c != '\n' || is_released(kp)) && offset < MAX_COMMAND-1);
+	} while (kp.c != '\n' || is_released(kp));
 
-	if (command[offset-1] != '\n') {
-		char c = '\n';
-		write_O((unsigned char*)&c, 1, GREEN);
-		command[offset] = '\0';
-	}
-	else {
-		command[offset-1] = '\0';
-	}
+	buff[offset] = '\0';
+	command->size = offset;
+
 	return;
 }
 

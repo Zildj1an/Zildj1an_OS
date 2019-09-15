@@ -59,6 +59,7 @@ typedef int size_t;
 typedef unsigned short UINT16;
 typedef unsigned char UINT8;
 typedef unsigned int UINT32;
+typedef unsigned long UINT64;
 typedef int COLOR;
 
 /* Return values errors */
