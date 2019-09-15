@@ -106,7 +106,7 @@ static void *malloc() {
 	if (dmem_head == NULL) {
 		ret = NULL;
 	} else {
-		ret = dmem_head+0x10;
+		ret = dmem_head+0x10; //Reserve the first 16 bytes for OS purposes
 		dmem_head = *(void**)dmem_head;
 	}
 	return ret;
@@ -117,7 +117,7 @@ static void free(void *ptr) {
 	void *next;
 	if (ptr) {
 		next = dmem_head;
-		dmem_head = ptr-1;
+		dmem_head = ptr-0x10;
 		*(void**)dmem_head = next;
 	}
 }
