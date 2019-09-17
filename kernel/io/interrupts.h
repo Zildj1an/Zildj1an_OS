@@ -6,7 +6,7 @@
 #ifndef _INTERRUPTS_H
 #define _INTERRUPTS_H
 
-#include "macros.h"
+#include "../macros.h"
 
 #define GDT_ENTRY_SIZE 8
 #define GDT_ENTRIES 3

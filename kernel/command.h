@@ -8,7 +8,7 @@
 #define _COMMAND_H
 
 #include "macros.h"
-#include "text.h"
+#include "io/text.h"
 #include "array.h"
 
 struct command {
@@ -37,6 +37,12 @@ static inline void clear_func(struct Array *arg){
 	cleanScreen();
 }
 
+/* prototype for asm timer */
+int * asm_timer(void);
+void time_func(struct Array *arg){
+    asm_timer();
+}
+
 void zchannel_func(struct Array *arg){}
 void pvs_func(struct Array *arg){}
 void ls_func(struct Array *arg){}
@@ -46,7 +52,6 @@ void exit_func(struct Array *arg){}
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
 
    Important commands to do:
-	0. echo (requires dividing the command in parts @ execute_command)
 	1. Man or help for displaying commands description
 	2. ls or dir (First we need to take care of the file system and managing)
 	3. Providing echo w the possibility to display GLOBAL VARIABLES
@@ -65,51 +70,51 @@ static void init_commands(void){
 	strcpy(command_list[EXIT_COMMAND].name,(unsigned char*)"exit");
 	strcpy(command_list[EXIT_COMMAND].description,
 			(unsigned char*)"Finish the OS session");
-
 	command_list[EXIT_COMMAND].id = EXIT_COMMAND;
 	command_list[EXIT_COMMAND].function = &exit_func;
-
+	/*-------------------------------------------------------------------*/
 	strcpy(command_list[CLEAR_COMMAND].name,(unsigned char*)"clear");
 	strcpy(command_list[CLEAR_COMMAND].description,
 			(unsigned char*)"Clear screen");
-
 	command_list[CLEAR_COMMAND].id = CLEAR_COMMAND;
 	command_list[CLEAR_COMMAND].function = &clear_func;
-
+        /*-------------------------------------------------------------------*/
 	strcpy(command_list[ECHO_COMMAND].name,(unsigned char*)"echo");
 	strcpy(command_list[ECHO_COMMAND].description,
 			(unsigned char*)"Display a message on screen");
-
 	// TODO: Echo could also display GLOBAL ENVIRONMENT VARIABLES SO WE CAN DO SCRIPTS
 	command_list[ECHO_COMMAND].id = ECHO_COMMAND;
 	command_list[ECHO_COMMAND].function = &echo_func;
-
+        /*-------------------------------------------------------------------*/
 	strcpy(command_list[MAN_COMMAND].name,(unsigned char*)"man");
 	strcpy(command_list[MAN_COMMAND].description,
 			(unsigned char*)"Help about commands");
-
 	command_list[MAN_COMMAND].id = MAN_COMMAND;
 	command_list[MAN_COMMAND].function = &man_func;
-
+        /*-------------------------------------------------------------------*/
 	strcpy(command_list[LS_COMMAND].name,(unsigned char*)"ls");
 	strcpy(command_list[LS_COMMAND].description,
 			(unsigned char*)"Display folder contents");
-
 	// TODO: File System
 	command_list[LS_COMMAND].id = LS_COMMAND;
 	command_list[LS_COMMAND].function = &ls_func;
+        /*-------------------------------------------------------------------*/
 	strcpy(command_list[PVS_COMMAND].name,(unsigned char*)"p-vs");
 	strcpy(command_list[PVS_COMMAND].description,(unsigned char*)"Execute scripts in the language p-vslang");
-
 	// TODO: Interpreter
 	command_list[PVS_COMMAND].id = PVS_COMMAND;
 	command_list[PVS_COMMAND].function = &pvs_func;
+        /*-------------------------------------------------------------------*/
 	strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"zchannel");
-	strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Connect to the IRC-channel");
-
+        strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Connect to the IRC-channel");
 	// TODO: A big todo
 	command_list[ZCHANNEL_COMMAND].id = ZCHANNEL_COMMAND;
 	command_list[ZCHANNEL_COMMAND].function = &zchannel_func;
+        /*-------------------------------------------------------------------*/
+	strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"time");
+        strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Display current time");
+	command_list[ZCHANNEL_COMMAND].id = TIME_COMMAND;
+	command_list[ZCHANNEL_COMMAND].function = &time_func;
 }
 
 static int execute_command(struct Array *command){

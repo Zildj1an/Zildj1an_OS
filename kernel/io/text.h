@@ -1,10 +1,10 @@
 #ifndef _TEXT_H_
 #define _TEXT_H_
 
-#include "macros.h"
+#include "../macros.h"
 #include "keyboard.h"
 #include "io.h"
-#include "array.h"
+#include "../array.h"
 
 UINT16* SCREEN_BUFFER;
 
@@ -27,12 +27,12 @@ static void scroll_half() {
 	unsigned int i, j;
 	for (i = ROW_TEXT/2; i < ROW_TEXT; ++i) {
 		for (j = 0; j < COLUMN_TEXT; ++j) {
-			SCREEN_BUFFER[j + (i-ROW_TEXT/2)*COLUMN_TEXT] = 
+			SCREEN_BUFFER[j + (i-ROW_TEXT/2)*COLUMN_TEXT] =
 				SCREEN_BUFFER[j + i*COLUMN_TEXT];
-			
+
 			SCREEN_BUFFER[j + i*COLUMN_TEXT] = ' ';
 		}
-		
+
 	}
 	positionY -= ROW_TEXT/2;
 }

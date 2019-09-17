@@ -5,13 +5,13 @@
 #ifndef _ARRAY_H
 #define _ARRAY_H
 
-#include "mem.h"
-#include "text.h"
+#include "io/mem.h"
+#include "io/text.h"
 
 static void print_hex(UINT32);
 
 struct Array {
-	
+
 	size_t size;
 	void *data;
 };
@@ -21,10 +21,10 @@ struct Array {
 struct Array *array(size_t size) {
 
 	struct Array *str;
-	
+
 	if (size > BLOCK_SIZE-2) {
 		str = NULL;
-	} else {	
+	} else {
 		str = (struct Array *) malloc();
 		if (str) {
 			str->size = size;

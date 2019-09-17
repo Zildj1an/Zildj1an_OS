@@ -6,17 +6,17 @@
     2019
 */
 
-#include "text.h"
+#include "io/text.h"
+#include "io/keyboard.h"
+#include "io/interrupts.h"
+#include "io/mem.h"
 #include "macros.h"
-#include "keyboard.h"
-#include "interrupts.h"
 #include "command.h"
-#include "mem.h"
 #include "array.h"
 
 int main_k(void* minfo){
 
-	unsigned char msg[]      = "Welcome to Zildj1an-OS\n";
+	unsigned char msg[]      = "Welcome to Zildj1an-OS\n################\n";
 	unsigned char prompt[]   = "ZildOS >";
 	unsigned char exit_msg[] = "Good bye!\n";
 	unsigned char error_msg[] = "Memory error, exiting...\n";

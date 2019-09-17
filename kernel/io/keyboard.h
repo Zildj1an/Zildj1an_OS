@@ -14,9 +14,9 @@
 
 #include "io.h"
 #include "interrupts.h"
-#include "macros.h"
+#include "../macros.h"
 
-#define BUF_SIZE 128 
+#define BUF_SIZE 128
 
 //Keycodes
 #define KEY_RELEASED 0xF0
