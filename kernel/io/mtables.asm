@@ -5,14 +5,14 @@
 
 [BITS 32]
 
-global load_gdt
-global reload_segments
-global load_idt
+[global load_gdt]
+[global reload_segments]
+[global load_idt]
 
 section .data	; We will hardcode the GDT in .data and then just load it
 
 gdt_desc:		; GDT Descriptor: size and address of the gdt
-	db 0	
+	db 0
 	dw 0
 
 idt_desc:
@@ -20,7 +20,7 @@ idt_desc:
 	dw 0
 
 section .text
-	
+
 load_gdt:			; Note that interrupts were already disabled in start.asm
 	mov eax, [esp + 4]	; Set address (first arg)
 	mov [gdt_desc + 2], eax
@@ -39,7 +39,6 @@ reload_CS:
 	mov gs, ax
 	mov ss, ax
 	ret
-
 
 load_idt:
 	mov eax, [esp + 4]	; Set address (first arg)

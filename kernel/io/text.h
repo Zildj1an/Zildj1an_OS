@@ -1,10 +1,10 @@
 #ifndef _TEXT_H_
 #define _TEXT_H_
 
-#include "macros.h"
+#include "../macros.h"
 #include "keyboard.h"
 #include "io.h"
-#include "array.h"
+#include "../array.h"
 
 UINT16* SCREEN_BUFFER = (UINT16*) VGA_ADDRESS;
 
@@ -51,18 +51,18 @@ static void scroll_half() {
 	unsigned int i, j;
 	for (i = ROW_TEXT/2; i < ROW_TEXT; ++i) {
 		for (j = 0; j < COLUMN_TEXT; ++j) {
-			SCREEN_BUFFER[j + (i-ROW_TEXT/2)*COLUMN_TEXT] = 
+			SCREEN_BUFFER[j + (i-ROW_TEXT/2)*COLUMN_TEXT] =
 				SCREEN_BUFFER[j + i*COLUMN_TEXT];
-			
+
 			SCREEN_BUFFER[j + i*COLUMN_TEXT] = ' ';
 		}
-		
+
 	}
 	positionY -= ROW_TEXT/2;
 }
 
 /* For now we assume stdout as Output */
-static int write_O(unsigned char* msg, size_t count, COLOR color) {
+int write_O(unsigned char* msg, size_t count, COLOR color) {
 
 	 int ret = 0;
 	 int i;
@@ -124,10 +124,10 @@ static int replace_O(unsigned char* msg, int count, COLOR color) {
 
 	int ret;
 	positionY = (ROW_TEXT - 1 + positionY - count/(COLUMN_TEXT)) % (ROW_TEXT-1);
-	
+
 	if (positionX < count%(COLUMN_TEXT-1))
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
-	
+
 	positionX = (COLUMN_TEXT-1 + positionX - (count%COLUMN_TEXT)) % (COLUMN_TEXT-1);
 	ret = write_O(msg, count, color);
 
@@ -216,13 +216,13 @@ static size_t get_arg(int argnum, unsigned char *command, unsigned char **arg) {
 			size = command+i-*arg;
 		} else {
 			if (command[i] == ' ' && !prev) {
-				prev = 1;				
-			} else if (command[i] != ' ' && prev) { 
+				prev = 1;
+			} else if (command[i] != ' ' && prev) {
 				prev = 0;
 				*arg = command+i;
 				++num;
 			}
-		}	
+		}
 		++i;
 	} while (!found && command[i] != '\0');
 
@@ -236,11 +236,11 @@ static void read_I(struct Array *command){
 	int offset = 0;
 	unsigned char *buff = (unsigned char *) command->data;
 	struct keypress kp;
-	
+
 	do {
 		kp = read_kb();
 		if (is_valid(kp) && !is_released(kp)) {
-			
+
 			if (is_ctrl(kp)) {
 			//Ctrl+<>
 			} else if(is_alt(kp)) {

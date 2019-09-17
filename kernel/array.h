@@ -5,10 +5,10 @@
 #ifndef _ARRAY_H
 #define _ARRAY_H
 
-#include "mem.h"
+#include "io/mem.h"
 
 struct Array {
-	
+
 	size_t size;
 	void *data;
 };
@@ -18,10 +18,10 @@ struct Array {
 struct Array *array(size_t size) {
 
 	struct Array *str;
-	
+
 	if (size > BLOCK_SIZE-2) {
 		str = NULL;
-	} else {	
+	} else {
 		str = (struct Array *) malloc();
 		if (str) {
 			str->size = size;

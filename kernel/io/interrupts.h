@@ -6,7 +6,7 @@
 #ifndef _INTERRUPTS_H
 #define _INTERRUPTS_H
 
-#include "macros.h"
+#include "../macros.h"
 
 #define GDT_ENTRY_SIZE 8
 #define GDT_ENTRIES 3
@@ -33,13 +33,13 @@ static int add_gdt_entry(int index, struct GDTDescr *entry) {
 	int retval;
 	UINT8 *offset;
 	if (index >= GDT_ENTRIES) {
-		retval = -EINVAL;	
+		retval = -EINVAL;
 	} else {
 		offset = GDT + (index*GDT_ENTRY_SIZE);
 
-		offset[0] = entry->limit & 0xFF;	
-		offset[1] = (entry->limit>>8) & 0xFF;	
-		offset[6] = (entry->limit>>16) & 0xF;	
+		offset[0] = entry->limit & 0xFF;
+		offset[1] = (entry->limit>>8) & 0xFF;
+		offset[6] = (entry->limit>>16) & 0xF;
 
 		offset[2] = entry->base & 0xFF;
 		offset[3] = (entry->base>>8) & 0xFF;
@@ -55,7 +55,7 @@ static int add_gdt_entry(int index, struct GDTDescr *entry) {
 	return retval;
 }
 
-static void populate_gdt() {
+static void populate_gdt(void) {
 
 	struct GDTDescr des;
 	UINT8 i;
@@ -86,18 +86,16 @@ extern void load_idt(struct IDTDescr* IDT, size_t size);
 
 struct interrupt_frame;
 
-
 __attribute__((interrupt)) static void empty_isr(struct interrupt_frame* frame) {
 	// Empty
 }
 
 static int add_idt_gate(void (*isr)(struct interrupt_frame*),
 				UINT16 pos, UINT8 type_attr) {
-	
-	int retval;
-	if (pos >= IDT_SIZE) {
-		retval = -EINVAL;
-	} else {
+	int retval = -EINVAL;
+
+	if (pos < IDT_SIZE) {
+
 		struct IDTDescr desc;
 		desc.offset_1 = ((UINT32) isr) & 0xFFFF;
 		desc.offset_2 = (((UINT32) isr) >> 16) & 0xFFFF;
@@ -111,8 +109,8 @@ static int add_idt_gate(void (*isr)(struct interrupt_frame*),
 	return retval;
 }
 
-static void pic_eoi(unsigned char irq) {
-	
+static void inline pic_eoi(unsigned char irq) {
+
 	if (irq >= 8)
 		outb(PIC2_COMMAND, PIC_EOI);
 	outb(PIC1_COMMAND, PIC_EOI);
@@ -121,6 +119,7 @@ static void pic_eoi(unsigned char irq) {
 static void inline mask_pic(UINT8 irq) {
 
 	UINT8 cmask;
+
 	if (irq < 8) {
 		cmask = inb(PIC1_DATA);
 		cmask |= 1<<irq;
@@ -135,6 +134,7 @@ static void inline mask_pic(UINT8 irq) {
 static void inline umask_pic(UINT8 irq) {
 
 	UINT8 cmask;
+
 	if(irq < 8) {
 		cmask = inb(PIC1_DATA);
 		cmask &= ~(1<<irq);
@@ -146,7 +146,8 @@ static void inline umask_pic(UINT8 irq) {
 	}
 }
 
-static void init_pic() {
+static void init_pic(void) {
+
 	//Mask all interrupts
 	outb(PIC1_DATA, 0xFF);
 	outb(PIC2_DATA, 0xFF);
@@ -175,8 +176,8 @@ static void init_pic() {
 	outb(PIC2_DATA, 0xFF);
 }
 
-static void setup_interrupts() {
-	
+static void setup_interrupts(void) {
+
 	unsigned int i;
 
 	// First, load the GDT

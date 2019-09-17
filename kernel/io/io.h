@@ -5,7 +5,7 @@
 #ifndef _IO_H
 #define _IO_H
 
-#include "macros.h"
+#include "../macros.h"
 
 static inline UINT8 inb(UINT16 port)
 {

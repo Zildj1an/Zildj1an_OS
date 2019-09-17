@@ -9,7 +9,7 @@
 #ifndef _MEM_H
 #define _MEM_H
 
-#include "macros.h"
+#include "../macros.h"
 
 static void *dmem_head;
 static void *dmem_limit;
@@ -46,20 +46,21 @@ static int read_mmap(void *minfo) {
 				ret = 0;
 				found = 1;
 				dmem_head = (void*)mem_base;
-				dmem_limit = (void*)mem_base + mem_size - BLOCK_SIZE;
+				dmem_limit = (void*)mem_base + mem_size 
+							- BLOCK_SIZE;
 			}
 
 			i += entry_size + 4;
-		}		
+		}
 	}
 	return ret;
 }
 
-/* Check if the kernel image is in the selected memory range 
+/* Check if the kernel image is in the selected memory range
  * and make sure not to overwrite it
  */
 static void check_kernel_addr() {
-	
+
 	void* up_diff;
 	void* low_diff;
 
@@ -70,7 +71,7 @@ static void check_kernel_addr() {
 	if (dmem_head < kaddr && kaddr < dmem_limit) {
 		up_diff = (void*)(dmem_limit - kaddr);
 		low_diff = (void*)(kaddr - dmem_head);
-		if (up_diff > low_diff) 
+		if (up_diff > low_diff)
 			dmem_head = (void*)(kaddr + MEM_SAFE_DISTANCE);
 		else
 			dmem_limit = (void*)(kaddr - MEM_SAFE_DISTANCE);
@@ -83,12 +84,15 @@ static int init_mem(void *minfo) {
 	unsigned int ret = read_mmap(minfo);
 
 	if (ret == 0) {
-	
+
 		check_kernel_addr();
 
-		for (i = 0; dmem_head + i < dmem_limit - BLOCK_SIZE; i += BLOCK_SIZE) {
-			*((UINT8**)dmem_head + i) = dmem_head + i + BLOCK_SIZE;
-		}	
+		for (i = 0; dmem_head + i < dmem_limit - BLOCK_SIZE;
+						i += BLOCK_SIZE) {
+
+			*((UINT8**)dmem_head + i) =
+					dmem_head + i + BLOCK_SIZE;
+		}
 		*(void**)(dmem_head + i) = NULL;
 	} 
 
@@ -103,14 +107,15 @@ static void *malloc() {
 	if (dmem_head == NULL) {
 		ret = NULL;
 	} else {
-		ret = dmem_head+0x10; //Reserve the first 16 bytes for OS purposes
+		//Reserve the first 16 bytes for OS purposes
+		ret = dmem_head+0x10;
 		dmem_head = *(void**)dmem_head;
 	}
 	return ret;
 }
 
 static void free(void *ptr) {
-	
+
 	void *next;
 	if (ptr) {
 		next = dmem_head;
