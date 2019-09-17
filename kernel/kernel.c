@@ -22,6 +22,7 @@ int main_k(void* minfo){
 	unsigned char error_msg[] = "Memory error, exiting...\n";
 
 	cleanScreen();
+	init_cursor();
 
 	int ret = init_mem(minfo);
 
@@ -44,6 +45,7 @@ int main_k(void* minfo){
 		read_I(command);
 		if(execute_command(command) == EXIT_COMMAND){
 			write_O((unsigned char*) &exit_msg, sizeof(exit_msg), BLUE);
+			stop_cursor();
 			break;
 		}
 	}

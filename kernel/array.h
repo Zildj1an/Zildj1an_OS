@@ -6,9 +6,6 @@
 #define _ARRAY_H
 
 #include "mem.h"
-#include "text.h"
-
-static void print_hex(UINT32);
 
 struct Array {
 	

@@ -10,9 +10,6 @@
 #define _MEM_H
 
 #include "macros.h"
-#include "text.h"
-
-static void print_hex(UINT32 h);
 
 static void *dmem_head;
 static void *dmem_limit;

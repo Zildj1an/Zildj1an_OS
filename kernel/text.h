@@ -6,10 +6,34 @@
 #include "io.h"
 #include "array.h"
 
-UINT16* SCREEN_BUFFER;
+UINT16* SCREEN_BUFFER = (UINT16*) VGA_ADDRESS;
 
 static int positionX = 0;
 static int positionY = 0;
+
+static inline void init_cursor() {
+
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, (inb(0x3D5) & 0xC0) | 10);
+	outb(0x3D4, 0x0B);
+	outb(0x3D5, (inb(0x3D5) & 0x80) | 11);
+}
+
+static inline void stop_cursor() {
+
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
+}
+
+static void update_cursor() {
+
+	UINT16 pos = positionY*COLUMN_TEXT+positionX;
+
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (UINT8) (pos & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (UINT8) ((pos >> 8) & 0xFF));
+}
 
 static inline UINT16 VGA_entry(unsigned char msg, COLOR color){
 
@@ -68,6 +92,7 @@ line:			positionX = 0;
 	}
 
 end:
+	update_cursor();
 	return ret;
 }
 
@@ -124,6 +149,7 @@ static int delete_O(size_t count) {
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 
+	update_cursor();
 	return ret;
 }
 
@@ -131,11 +157,11 @@ static int delete_O(size_t count) {
 static inline void cleanScreen(void){
 
 	unsigned int i = 0;
-	unsigned char *msg = (unsigned char*) ' ';
+	//unsigned char *msg = (unsigned char*) ' ';
 	int max = ROW_TEXT * COLUMN_TEXT;
 
 	for (i = 0; i < max; ++i) 
-		write_O((unsigned char*) msg, 1,BLACK);
+		SCREEN_BUFFER[i] = VGA_entry(' ', GREEN);
 
 	positionX = 0;
 	positionY = 0;
