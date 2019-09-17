@@ -5,8 +5,9 @@
 
 [BITS 32]
 
-global asm_timer
-global quit
+[global asm_timer]
+[global quit]
+[extern write_O]
 
 SECTION .data
 msg        db      'From 1970 (in seconds): ', 0h
@@ -16,11 +17,11 @@ global  _start
 
 asm_timer:
 
-    mov     edx, 24     ; num of bytes to write
-    mov     ecx, msg    ; Our string into ECX
-    mov     ebx, 1      ; write to stdout file
-    mov     eax, 4      ; invoke SYS_WRITE (kernel opcode 4)
-    int     80h
+    ; TODO ver como paso los tres args
+    ;msg]        ; msg
+    ;mov ebx, 24		; count
+    ;mov ecx, 1 		; color
+    ;call    write_O
 
     mov     eax, 13     ; invoke SYS_TIME (kernel opcode 13)
     int     80h         ; call the kernel

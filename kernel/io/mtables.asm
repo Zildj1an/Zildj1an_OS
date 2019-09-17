@@ -5,9 +5,9 @@
 
 [BITS 32]
 
-global load_gdt
-global reload_segments
-global load_idt
+[global load_gdt]
+[global reload_segments]
+[global load_idt]
 
 section .data	; We will hardcode the GDT in .data and then just load it
 
