@@ -26,7 +26,8 @@ void echo_func(struct Array *arg){
 	unsigned char *msg;
 	size_t csize = get_arg(0, arg->data, &msg);
 	size_t argsize;
-	if (csize > 0) {
+
+	if (csize) {
 		argsize = arg->size - (msg - (unsigned char *)arg->data) - csize - 1;
 		write_O((unsigned char*) msg+csize + 1, argsize, RED);
 	}
@@ -97,18 +98,14 @@ static void init_commands(void){
 	// TODO: File System
 	command_list[LS_COMMAND].id = LS_COMMAND;
 	command_list[LS_COMMAND].function = &ls_func;
-
 	strcpy(command_list[PVS_COMMAND].name,(unsigned char*)"p-vs");
-	strcpy(command_list[PVS_COMMAND].description,
-			(unsigned char*)"Execute scripts in the language p-vslang");
+	strcpy(command_list[PVS_COMMAND].description,(unsigned char*)"Execute scripts in the language p-vslang");
 
 	// TODO: Interpreter
 	command_list[PVS_COMMAND].id = PVS_COMMAND;
 	command_list[PVS_COMMAND].function = &pvs_func;
-
 	strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"zchannel");
-	strcpy(command_list[ZCHANNEL_COMMAND].description,
-			(unsigned char*)"Connect to the IRC-channel");
+	strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Connect to the IRC-channel");
 
 	// TODO: A big todo
 	command_list[ZCHANNEL_COMMAND].id = ZCHANNEL_COMMAND;
