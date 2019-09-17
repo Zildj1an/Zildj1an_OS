@@ -17,11 +17,10 @@ global  _start
 
 asm_timer:
 
-    ; TODO ver como paso los tres args
-    ;msg]        ; msg
-    ;mov ebx, 24		; count
-    ;mov ecx, 1 		; color
-    ;call    write_O
+    push msg        	; msg
+    push 24		; count
+    push 1 		; color
+    call    write_O
 
     mov     eax, 13     ; invoke SYS_TIME (kernel opcode 13)
     int     80h         ; call the kernel

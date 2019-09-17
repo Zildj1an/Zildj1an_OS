@@ -9,6 +9,7 @@
 
 #include "macros.h"
 #include "io/text.h"
+#include "file_system/fs.h"
 #include "array.h"
 
 struct command {
@@ -45,7 +46,40 @@ void time_func(struct Array *arg){
 
 void zchannel_func(struct Array *arg){}
 void pvs_func(struct Array *arg){}
-void ls_func(struct Array *arg){}
+
+void ls_func(struct Array *arg){
+
+     unsigned int i = 0;
+     char elem;
+     unsigned char msg[] = "\n";
+     unsigned char sep[] = "   -   ";
+     unsigned char exec[] = "EXECUTABLE";
+     unsigned char text[] = "TEXT";
+     unsigned char folder[] = "FOLDER";
+/*
+     TODO change for sizeof(data in CURR_FOLDER)
+*/
+
+     for(; i < 3 ; ++i){
+		 elem = hierarchy.files[CURR_FOLDER].data[i];
+		 if (elem != ',' && elem != ' ') {
+
+                 	write_O((unsigned char*)hierarchy.files[elem - '0'].file_name,
+				sizeof(hierarchy.files[elem - '0'].file_name),RED);
+			write_O((unsigned char*)sep,sizeof(sep),RED);
+
+			if (hierarchy.files[elem - '0'].type == EXEC_FILE)
+				write_O((unsigned char*)exec,sizeof(exec),RED);
+			else if (hierarchy.files[elem - '0'].type == TEXT_FILE)
+				 write_O((unsigned char*)text,sizeof(text),RED);
+			else
+				 write_O((unsigned char*)folder,sizeof(folder),RED);
+
+			write_O((unsigned char*)msg,sizeof(msg),RED);
+   		 }
+   }
+}
+
 void man_func(struct Array *arg){}
 void exit_func(struct Array *arg){}
 

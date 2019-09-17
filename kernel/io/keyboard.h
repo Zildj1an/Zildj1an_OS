@@ -109,39 +109,39 @@ static char fromKeycode(UINT8 kc) {
 }
 
 static int sendb(UINT8 data) {
-	
+
 	UINT8 ready = 1;
-	
+
 	while (ready)
 		ready = inb(PS2_STATUS_REG) & 2;
-	
+
 	outb(PS2_DATA_REG, data);
 	return 0;
 }
 
-static UINT8 readb() {
-	
+static UINT8 readb(void) {
+
 	UINT8 ready = 0;
 	while (!ready)
 		ready = inb(PS2_STATUS_REG) & 1;
-	
+
 	UINT8 data = inb(PS2_DATA_REG);
 	return data;
 }
 
-static int check_kb() {
-	
+static int check_kb(void) {
+
 	int retval = -1;
 	sendb(KB_ECHO);
 	UINT8 val = readb();
 	if (val == KB_ECHO)
 		retval = 0;
-	
+
 	return retval;
 }
 
 //Process keypress
-static void proc_kp() {
+static void proc_kp(void) {
 
 	UINT8 complete = 0, release = 0;
 	struct keypress kp;
@@ -191,7 +191,7 @@ __attribute__((interrupt)) static void kb_isr(struct interrupt_frame* frame) {
 	pic_eoi(1);
 }
 
-static int init_kb() {
+static int init_kb(void) {
 
 	UINT8 res;
 	int retval = -1;
@@ -221,7 +221,7 @@ static int init_kb() {
 	return retval;
 }
 
-static UINT8 read_kc() {
+static UINT8 read_kc(void) {
 
 	UINT8 kc = 0;
 	if (inr_offset != inw_offset) {
@@ -233,7 +233,7 @@ static UINT8 read_kc() {
 	return kc;
 }
 
-static struct keypress read_kb() {
+static struct keypress read_kb(void) {
 
 	struct keypress kp;
 	kp.info = 1<<7;

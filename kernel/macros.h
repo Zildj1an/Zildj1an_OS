@@ -43,7 +43,7 @@ typedef int COLOR;
 #define PIC2_COMMAND	PIC2
 #define PIC2_DATA	(PIC2+1)
 #define PIC_EOI		0x20
-#define PIC1_IRQ_OFFSET 0x40 
+#define PIC1_IRQ_OFFSET 0x40
 #define PIC2_IRQ_OFFSET 0x48
 #define PIC_INITIALIZE 0x11
 #define PIC_KB_IRQ 1
@@ -82,5 +82,15 @@ typedef int COLOR;
 #define CLEAR_COMMAND    6
 #define TIME_COMMAND     7
 
+/* Files */
+#define MAX_FILE_NAME    10
+#define MAX_FILE_SIZE    30
+#define NUM_FILES        20
+#define EXEC_FILE        0
+#define TEXT_FILE        1
+#define FOLDER_FILE      2
+#define PRIVATE_FILE     0
+#define PUBLIC_FILE      1
+#define CURR_FOLDER      0
 
 #endif

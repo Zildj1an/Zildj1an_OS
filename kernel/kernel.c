@@ -10,6 +10,7 @@
 #include "io/keyboard.h"
 #include "io/interrupts.h"
 #include "io/mem.h"
+#include "file_system/fs.h"
 #include "macros.h"
 #include "command.h"
 #include "array.h"
@@ -38,6 +39,7 @@ int main_k(void* minfo){
 
 	init_commands();
 	init_kb();
+        init_fs(); 				/* Inite File System */
 
 	while (1) {
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
