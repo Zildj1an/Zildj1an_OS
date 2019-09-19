@@ -46,17 +46,6 @@ static inline int invalid_color(COLOR color){
 	  && color != BROWN && color != WHITE);
 }
 
-static inline int strlen(unsigned char *str){
-
-    unsigned char *start = str;
-
-    while(*str!='\0')
-        str++;
-
-    return str - start;
-}
-
-
 static void scroll_half() {
 
 	unsigned int i, j;
@@ -73,7 +62,7 @@ static void scroll_half() {
 }
 
 /* For now we assume stdout as Output */
-int __write_O(unsigned char* msg, size_t count, COLOR color) {
+int write_O(unsigned char* msg, size_t count, COLOR color) {
 
 	 int ret = 0;
 	 int i;
@@ -107,19 +96,6 @@ end:
 	return ret;
 }
 
-
-/* Wrapper */
-int write_O(unsigned char* msg, size_t count, COLOR color){
-
-   unsigned char sep[] = " ";
-   int ret;
-
-   if(!positionX)
-          __write_O((unsigned char*)sep, 1, color);
-   ret =  __write_O(msg, count, color);
-
-   return ret;
-}
 
 static inline char hex_to_char(UINT8 hex) {
 
@@ -289,14 +265,14 @@ static void read_I(struct Array *command){
 	return;
 }
 
-static inline void indent(unsigned char* msg){
+static inline int strlen(unsigned char *str){
 
-        unsigned char sp[] = " ";
-        unsigned int s;
+    unsigned char *start = str;
 
-         /* Correct identation */
-         for(s = strlen(msg); s < 15; ++s)
-                       write_O((unsigned char*)sp,1,RED);
+    while(*str!='\0')
+        str++;
+
+    return str - start;
 }
 
 
