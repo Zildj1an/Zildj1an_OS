@@ -44,28 +44,44 @@ void time_func(struct Array *arg){
     asm_timer();
 }
 
+void go_func(struct Array *arg){
+
+   unsigned int i = 0;
+   /*CURR_FOLDER
+       for(; i < strlen(hierarchy.files[CURR_FOLDER].data) ; ++i){
+
+                 elem = hierarchy.files[CURR_FOLDER].data[i];
+	}
+*/
+}
+
 void zchannel_func(struct Array *arg){}
 void pvs_func(struct Array *arg){}
 
 void ls_func(struct Array *arg){
 
-     unsigned int i = 0;
+     unsigned int i = 0, s;
      char elem;
-     unsigned char msg[] = "\n";
-     unsigned char sep[] = "   -   ";
-     unsigned char exec[] = "EXECUTABLE";
-     unsigned char text[] = "TEXT";
+     unsigned char msg[]    = "\n";
+     unsigned char sep[]    = "-      ";
+     unsigned char sp[]     = " ";
+     unsigned char exec[]   = "EXECUTABLE";
+     unsigned char text[]   = "TEXT";
      unsigned char folder[] = "FOLDER";
-/*
-     TODO change for sizeof(data in CURR_FOLDER)
-*/
 
-     for(; i < 3 ; ++i){
+
+     for(; i < strlen(hierarchy.files[CURR_FOLDER].data) ; ++i){
+
 		 elem = hierarchy.files[CURR_FOLDER].data[i];
+
 		 if (elem != ',' && elem != ' ') {
 
                  	write_O((unsigned char*)hierarchy.files[elem - '0'].file_name,
 				sizeof(hierarchy.files[elem - '0'].file_name),RED);
+
+			for(s = strlen(hierarchy.files[elem - '0'].file_name); s < 15; ++s)
+				 write_O((unsigned char*)sp,sizeof(sp),RED);
+
 			write_O((unsigned char*)sep,sizeof(sep),RED);
 
 			if (hierarchy.files[elem - '0'].type == EXEC_FILE)
@@ -149,6 +165,14 @@ static void init_commands(void){
         strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Display current time");
 	command_list[ZCHANNEL_COMMAND].id = TIME_COMMAND;
 	command_list[ZCHANNEL_COMMAND].function = &time_func;
+        /*-------------------------------------------------------------------*/
+        strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"go");
+        strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Change the folder");
+        // TODO: A big todo
+        command_list[ZCHANNEL_COMMAND].id = GO_COMMAND;
+        command_list[ZCHANNEL_COMMAND].function = &go_func;
+        /*-------------------------------------------------------------------*/
+
 }
 
 static int execute_command(struct Array *command){

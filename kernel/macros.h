@@ -72,7 +72,7 @@ typedef int COLOR;
 
 /* Commands*/
 #define MAX_COMMAND      60
-#define NUM_COMMANDS     8
+#define NUM_COMMANDS     9
 #define EXIT_COMMAND     0
 #define ECHO_COMMAND     1
 #define MAN_COMMAND      2
@@ -81,6 +81,7 @@ typedef int COLOR;
 #define ZCHANNEL_COMMAND 5
 #define CLEAR_COMMAND    6
 #define TIME_COMMAND     7
+#define GO_COMMAND       8
 
 /* Files */
 #define MAX_FILE_NAME    10

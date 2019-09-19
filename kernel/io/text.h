@@ -139,18 +139,28 @@ static int delete_O(size_t count) {
 	int ret,i;
 	unsigned char empty[count];
 
-	for (i = 0; i < count; ++i) 
+	for (i = 0; i < count; ++i)
 		empty[i] = ' ';
 
 	ret = replace_O((unsigned char *) empty, count, GREEN);
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
 
-	if (positionX < count) 
+	if (positionX < count)
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 
 	update_cursor();
 	return ret;
+}
+
+static inline int strlen(unsigned char *str){
+
+    unsigned char *start = str;
+
+    while(*str!='\0')
+        str++;
+
+    return str - start;
 }
 
 
@@ -160,7 +170,7 @@ static inline void cleanScreen(void){
 	//unsigned char *msg = (unsigned char*) ' ';
 	int max = ROW_TEXT * COLUMN_TEXT;
 
-	for (i = 0; i < max; ++i) 
+	for (i = 0; i < max; ++i)
 		SCREEN_BUFFER[i] = VGA_entry(' ', GREEN);
 
 	positionX = 0;
