@@ -46,6 +46,17 @@ static inline int invalid_color(COLOR color){
 	  && color != BROWN && color != WHITE);
 }
 
+static inline int strlen(unsigned char *str){
+
+    unsigned char *start = str;
+
+    while(*str!='\0')
+        str++;
+
+    return str - start;
+}
+
+
 static void scroll_half() {
 
 	unsigned int i, j;
@@ -152,17 +163,6 @@ static int delete_O(size_t count) {
 	update_cursor();
 	return ret;
 }
-
-static inline int strlen(unsigned char *str){
-
-    unsigned char *start = str;
-
-    while(*str!='\0')
-        str++;
-
-    return str - start;
-}
-
 
 static inline void cleanScreen(void){
 
@@ -275,5 +275,16 @@ static void read_I(struct Array *command){
 
 	return;
 }
+
+static inline void indent(unsigned char* msg){
+
+        unsigned char sp[] = " ";
+        unsigned int s;
+
+         /* Correct identation */
+         for(s = strlen(msg); s < 15; ++s)
+                       write_O((unsigned char*)sp,1,RED);
+}
+
 
 #endif

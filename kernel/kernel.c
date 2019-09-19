@@ -1,9 +1,11 @@
 /*
+    ###################################
     Called by start.asm
-    Authors:
+    Proud Authors:
     Carlos Bilbao (Zildj1an)
     Pablo Villalobos (pablo-vs)
     2019
+    ##################################
 */
 
 #include "io/text.h"
@@ -15,11 +17,21 @@
 #include "command.h"
 #include "array.h"
 
+static void inline welcome_msg(void){
+
+        unsigned char msg[]       = "#######################\n";
+        unsigned char welcome[]   = " Welcome to Zildj1an-OS\n";
+
+        write_O((unsigned char*) &msg, sizeof(msg), RED);
+        write_O((unsigned char*) &welcome, sizeof(welcome), WHITE);
+        write_O((unsigned char*) &msg, sizeof(msg), RED);
+}
+
+
 int main_k(void* minfo){
 
-	unsigned char msg[]      = "Welcome to Zildj1an-OS\n################\n";
-	unsigned char prompt[]   = "ZildOS >";
-	unsigned char exit_msg[] = "Good bye!\n";
+	unsigned char prompt[]    = "ZildOS >";
+	unsigned char exit_msg[]  = "Good bye!\n";
 	unsigned char error_msg[] = "Memory error, exiting...\n";
 
 	cleanScreen();
@@ -33,11 +45,8 @@ int main_k(void* minfo){
 	}
 
 	setup_interrupts();
-
-	write_O((unsigned char*) &msg, sizeof(msg), RED);
-
+	welcome_msg();
 	struct Array *command = array(MAX_COMMAND);
-
 	init_commands();
 	init_kb();
         init_fs(); 				/* Inite File System */

@@ -46,13 +46,34 @@ void time_func(struct Array *arg){
 
 void go_func(struct Array *arg){
 
-   unsigned int i = 0;
-   /*CURR_FOLDER
-       for(; i < strlen(hierarchy.files[CURR_FOLDER].data) ; ++i){
+    /* OPCION go back/go top  -> palabras reservadas al crear archivos!!! */
+    unsigned int i = 0, find = 0, argsize;
+    unsigned char *dir;
+    unsigned char err[] = "That is not a valid location!\n";
+    char elem;
+    size_t csize = get_arg(0, arg->data, &dir);
 
-                 elem = hierarchy.files[CURR_FOLDER].data[i];
-	}
-*/
+    argsize = arg->size - (dir - (unsigned char *)arg->data) - csize - 1;
+
+    /* Check desired destination */
+    for (;!find &&  i < strlen(hierarchy.files[CURR_FOLDER].data); ++i){
+
+                elem = hierarchy.files[CURR_FOLDER].data[i];
+
+		if (elem != ',' && elem != ' ') {
+
+	             /* TODO problem with this check */
+		     if (equal_str((unsigned char*) hierarchy.files[elem - '0'].file_name,
+			(unsigned char*)dir+csize + 1, strlen(hierarchy.files[elem - '0'].file_name),
+			 argsize) > 0){
+				find = 1;
+				CURR_FOLDER = elem - '0';
+		     }
+		}
+    }
+
+    if (!find)
+          write_O((unsigned char*)err,sizeof(err),RED);
 }
 
 void zchannel_func(struct Array *arg){}
@@ -60,17 +81,16 @@ void pvs_func(struct Array *arg){}
 
 void ls_func(struct Array *arg){
 
-     unsigned int i = 0, s;
+     unsigned int i = 0;
      char elem;
      unsigned char msg[]    = "\n";
      unsigned char sep[]    = "-      ";
-     unsigned char sp[]     = " ";
      unsigned char exec[]   = "EXECUTABLE";
      unsigned char text[]   = "TEXT";
      unsigned char folder[] = "FOLDER";
 
 
-     for(; i < strlen(hierarchy.files[CURR_FOLDER].data) ; ++i){
+     for (; i < strlen(hierarchy.files[CURR_FOLDER].data) ; ++i){
 
 		 elem = hierarchy.files[CURR_FOLDER].data[i];
 
@@ -78,10 +98,7 @@ void ls_func(struct Array *arg){
 
                  	write_O((unsigned char*)hierarchy.files[elem - '0'].file_name,
 				sizeof(hierarchy.files[elem - '0'].file_name),RED);
-
-			for(s = strlen(hierarchy.files[elem - '0'].file_name); s < 15; ++s)
-				 write_O((unsigned char*)sp,sizeof(sp),RED);
-
+		        indent(hierarchy.files[elem - '0'].file_name);
 			write_O((unsigned char*)sep,sizeof(sep),RED);
 
 			if (hierarchy.files[elem - '0'].type == EXEC_FILE)
@@ -93,10 +110,27 @@ void ls_func(struct Array *arg){
 
 			write_O((unsigned char*)msg,sizeof(msg),RED);
    		 }
-   }
+    }
 }
 
-void man_func(struct Array *arg){}
+void info_func(struct Array *arg){
+
+	unsigned char sep[]    = "-      ";
+	unsigned char next[]   = "\n";
+	unsigned int i = 0;
+
+	for(; i < NUM_COMMANDS; ++i) {
+
+		write_O((unsigned char*)command_list[i].name,sizeof(command_list[i].name),RED);
+		indent(command_list[i].name);
+		write_O((unsigned char*)sep,sizeof(sep),RED);
+		write_O((unsigned char*)command_list[i].description,sizeof(command_list[i].description),RED);
+		write_O((unsigned char*)next,sizeof(next),RED);
+	}
+
+}
+
+
 void exit_func(struct Array *arg){}
 
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
@@ -114,6 +148,7 @@ void exit_func(struct Array *arg){}
 			to see results within this by summer or later
 			Z-CHANNEL COULD BE USED TO EXCHANGE p-vslang FILES
 	6. ?
+	7. mkdir, rmdir
 */
 static void init_commands(void){
 
@@ -136,11 +171,11 @@ static void init_commands(void){
 	command_list[ECHO_COMMAND].id = ECHO_COMMAND;
 	command_list[ECHO_COMMAND].function = &echo_func;
         /*-------------------------------------------------------------------*/
-	strcpy(command_list[MAN_COMMAND].name,(unsigned char*)"man");
-	strcpy(command_list[MAN_COMMAND].description,
+	strcpy(command_list[INFO_COMMAND].name,(unsigned char*)"info");
+	strcpy(command_list[INFO_COMMAND].description,
 			(unsigned char*)"Help about commands");
-	command_list[MAN_COMMAND].id = MAN_COMMAND;
-	command_list[MAN_COMMAND].function = &man_func;
+	command_list[INFO_COMMAND].id = INFO_COMMAND;
+	command_list[INFO_COMMAND].function = &info_func;
         /*-------------------------------------------------------------------*/
 	strcpy(command_list[LS_COMMAND].name,(unsigned char*)"ls");
 	strcpy(command_list[LS_COMMAND].description,
@@ -161,18 +196,16 @@ static void init_commands(void){
 	command_list[ZCHANNEL_COMMAND].id = ZCHANNEL_COMMAND;
 	command_list[ZCHANNEL_COMMAND].function = &zchannel_func;
         /*-------------------------------------------------------------------*/
-	strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"time");
-        strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Display current time");
-	command_list[ZCHANNEL_COMMAND].id = TIME_COMMAND;
-	command_list[ZCHANNEL_COMMAND].function = &time_func;
+	strcpy(command_list[TIME_COMMAND].name,(unsigned char*)"time");
+        strcpy(command_list[TIME_COMMAND].description,(unsigned char*)"Display current time");
+	command_list[TIME_COMMAND].id = TIME_COMMAND;
+	command_list[TIME_COMMAND].function = &time_func;
         /*-------------------------------------------------------------------*/
-        strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"go");
-        strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Change the folder");
-        // TODO: A big todo
-        command_list[ZCHANNEL_COMMAND].id = GO_COMMAND;
-        command_list[ZCHANNEL_COMMAND].function = &go_func;
+        strcpy(command_list[GO_COMMAND].name,(unsigned char*)"go");
+        strcpy(command_list[GO_COMMAND].description,(unsigned char*)"Change the folder");
+        command_list[GO_COMMAND].id = GO_COMMAND;
+        command_list[GO_COMMAND].function = &go_func;
         /*-------------------------------------------------------------------*/
-
 }
 
 static int execute_command(struct Array *command){

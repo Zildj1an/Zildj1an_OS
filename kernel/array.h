@@ -13,7 +13,7 @@ struct Array {
 	void *data;
 };
 
-// Since malloc returns a fixed-size bloc, just store the data in the block following
+// Since malloc returns a fixed-size block, just store the data in the block following
 // the array struct
 struct Array *array(size_t size) {
 

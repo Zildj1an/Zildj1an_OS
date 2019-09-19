@@ -14,6 +14,8 @@ typedef unsigned int UINT32;
 typedef unsigned long UINT64;
 typedef int COLOR;
 
+static int CURR_FOLDER = 0;
+
 #define NULL 0
 
 /* VGA Colors */
@@ -75,7 +77,7 @@ typedef int COLOR;
 #define NUM_COMMANDS     9
 #define EXIT_COMMAND     0
 #define ECHO_COMMAND     1
-#define MAN_COMMAND      2
+#define INFO_COMMAND     2
 #define LS_COMMAND       3
 #define PVS_COMMAND      4
 #define ZCHANNEL_COMMAND 5
@@ -92,6 +94,5 @@ typedef int COLOR;
 #define FOLDER_FILE      2
 #define PRIVATE_FILE     0
 #define PUBLIC_FILE      1
-#define CURR_FOLDER      0
 
 #endif
