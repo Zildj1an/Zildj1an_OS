@@ -15,6 +15,7 @@ typedef unsigned long UINT64;
 typedef int COLOR;
 
 #define NULL 0
+#define FIRST(A, ...) A
 
 /* VGA Colors */
 #define VGA_ADDRESS 0xB8000

@@ -15,6 +15,7 @@
 #include "io.h"
 #include "interrupts.h"
 #include "../macros.h"
+#include "../string.h"
 
 #define BUF_SIZE 128
 
@@ -83,9 +84,6 @@ static inline int is_ctrl(struct keypress kp) {return kp.info & (1<<2);}
 static inline int is_alt(struct keypress kp) {return kp.info & (1<<3);}
 static inline int is_shift(struct keypress kp) {return kp.info & (1<<4);}
 static inline int is_valid(struct keypress kp) {return !(kp.info & (1<<7));}
-static inline int is_alpha(char c) {
-	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
-}
 
 static UINT8 inputBuffer[BUF_SIZE];
 static UINT16 inw_offset = 0, inr_offset = 0;

@@ -13,7 +13,7 @@
 #include "file_system/fs.h"
 #include "macros.h"
 #include "command.h"
-#include "array.h"
+#include "string.h"
 
 int main_k(void* minfo){
 
@@ -25,9 +25,9 @@ int main_k(void* minfo){
 	cleanScreen();
 	init_cursor();
 
-	int ret = init_mem(minfo);
+	int ret;
 
-	if (ret < 0) {
+	if ((ret = init_mem(minfo)) < 0) {
 		write_O((unsigned char*) &error_msg, sizeof(error_msg), RED);
 		return -1;
 	}
@@ -36,11 +36,11 @@ int main_k(void* minfo){
 
 	write_O((unsigned char*) &msg, sizeof(msg), RED);
 
-	struct Array *command = array(MAX_COMMAND);
+	unsigned char *command = string(MAX_COMMAND);
 
 	init_commands();
 	init_kb();
-        init_fs(); 				/* Inite File System */
+        init_fs(); 				/* Setup File System */
 
 	while (1) {
 		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);

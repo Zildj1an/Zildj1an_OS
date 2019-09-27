@@ -4,7 +4,8 @@
 #include "../macros.h"
 #include "keyboard.h"
 #include "io.h"
-#include "../array.h"
+#include "../string.h"
+
 
 UINT16* SCREEN_BUFFER = (UINT16*) VGA_ADDRESS;
 
@@ -64,17 +65,17 @@ static void scroll_half() {
 /* For now we assume stdout as Output */
 int write_O(unsigned char* msg, size_t count, COLOR color) {
 
-	 int ret = 0;
-	 int i;
+	int ret = 0;
+	int i;
 
-	 SCREEN_BUFFER = (UINT16*) VGA_ADDRESS;
+	SCREEN_BUFFER = (UINT16*) VGA_ADDRESS;
 
-	 if (count <= 0 || !msg || invalid_color(color)) {
+	if (count <= 0 || !msg || invalid_color(color)) {
 		ret = -EINVAL;
 		goto end;
-	 }
+	}
 
-	 for (i = 0; i < count && msg[i] != '\0'; ++i) {
+	for (i = 0; i < count && msg[i] != '\0'; ++i) {
 
 		if(*(msg + i) == '\n') goto line;
 
@@ -96,11 +97,12 @@ end:
 	return ret;
 }
 
-
-static inline char hex_to_char(UINT8 hex) {
-
-	if(hex < 0xA) return '0'+hex;
-	else return 'A'-10+hex;
+int write_Ons(unsigned char* msg, COLOR color) {
+	
+	int ret;
+	size_t count = strlen(msg);
+	ret = write_O(msg, count, color);
+	return ret;
 }
 
 static void print_hex(UINT32 kc) {
@@ -134,6 +136,14 @@ static int replace_O(unsigned char* msg, int count, COLOR color) {
 	return ret;
 }
 
+static int replace_Ons(unsigned char* msg, COLOR color) {
+	
+	int ret;
+	size_t count = strlen(msg);
+	ret = replace_O(msg, count, color);
+	return ret;
+}
+
 static int delete_O(size_t count) {
 
 	int ret,i;
@@ -157,7 +167,6 @@ static int delete_O(size_t count) {
 static inline void cleanScreen(void){
 
 	unsigned int i = 0;
-	//unsigned char *msg = (unsigned char*) ' ';
 	int max = ROW_TEXT * COLUMN_TEXT;
 
 	for (i = 0; i < max; ++i) 
@@ -167,74 +176,11 @@ static inline void cleanScreen(void){
 	positionY = 0;
 }
 
-static inline int equal_str(unsigned char *a, unsigned char *b, unsigned int size_a, unsigned int size_b){
-
-	unsigned int i;
-	if (size_a != size_b) return -EINVAL;
-	for (i = 0; i < size_a && a[i] == b[i] && a[i] != '\0'; ++i){}
-	return (i == size_a || (b[i] == '\0' && a[i] == '\0'));
-}
-
-// Function to implement strcpy() function
-unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
-
-	unsigned char *ptr;
-
-	// return if no memory is allocated to the destination
-	if (!destination)
-		return NULL;
-
-	ptr = destination;
-
-	while (*source != '\0'){
-		*destination = *source;
-		destination++;
-		source++;
-	}
-
-	*destination = '\0';
-
-	return ptr;
-}
-
-/**
- * Returns a pointer to the argnum argument in command, stored in arg,
- * and the size of the argument, or 0 if there are less than argnum arguments
- */
-static size_t get_arg(int argnum, unsigned char *command, unsigned char **arg) {
-
-	UINT8 i = 0;
-	UINT8 num = -1;
-	UINT8 found = 0;
-	UINT8 prev = 1;
-	size_t size = 0;
-
-	*arg = command;
- 	do {
-		if (num == argnum && (command[i] == ' ' || command[i] == '\n')) {
-			found = 1;
-			size = command+i-*arg;
-		} else {
-			if (command[i] == ' ' && !prev) {
-				prev = 1;
-			} else if (command[i] != ' ' && prev) {
-				prev = 0;
-				*arg = command+i;
-				++num;
-			}
-		}
-		++i;
-	} while (!found && command[i] != '\0');
-
-	return size;
-}
-
-static void read_I(struct Array *command){
+static void read_I(unsigned char *command){
 
 	//Returns size of command
 
 	int offset = 0;
-	unsigned char *buff = (unsigned char *) command->data;
 	struct keypress kp;
 
 	do {
@@ -252,16 +198,16 @@ static void read_I(struct Array *command){
 						--offset;
 					}
 				} else if (offset < MAX_COMMAND - 2 || kp.c == '\n') {
-					buff[offset] = kp.c;
-					write_O(buff+offset, 1, GREEN);
+					command[offset] = kp.c;
+					write_O(command+offset, 1, GREEN);
 					++offset;
 				}
 			}
 		}
 	} while (kp.c != '\n' || is_released(kp));
 
-	buff[offset] = '\0';
-	command->size = offset;
+	command[offset] = '\0';
+	set_len(command, offset);
 
 	return;
 }

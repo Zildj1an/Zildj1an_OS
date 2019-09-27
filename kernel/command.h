@@ -10,44 +10,44 @@
 #include "macros.h"
 #include "io/text.h"
 #include "file_system/fs.h"
-#include "array.h"
+#include "string.h"
 
 struct command {
 
 	unsigned char name[MAX_COMMAND];
 	unsigned char description[MAX_COMMAND];
 	unsigned int id;
-	void (*function)(struct Array *arg);
+	void (*function)(unsigned char *arg);
 };
 
 struct command command_list[NUM_COMMANDS];
 
-void echo_func(struct Array *arg){
+void echo_func(unsigned char *arg){
 
-	unsigned char *msg;
-	size_t csize = get_arg(0, arg->data, &msg);
-	size_t argsize;
+	size_t msg;
+	size_t csize = get_arg(0, arg, &msg);
+	//size_t argsize;
 
 	if (csize) {
-		argsize = arg->size - (msg - (unsigned char *)arg->data) - csize - 1;
-		write_O((unsigned char*) msg+csize + 1, argsize, RED);
+		//argsize = strlen(arg) - msg - csize - 1;
+		write_Ons(arg + msg + csize + 1, RED);
 	}
 }
 
-static inline void clear_func(struct Array *arg){
+static inline void clear_func(unsigned char *arg){
 	cleanScreen();
 }
 
 /* prototype for asm timer */
 int * asm_timer(void);
-void time_func(struct Array *arg){
+void time_func(unsigned char *arg){
     asm_timer();
 }
 
-void zchannel_func(struct Array *arg){}
-void pvs_func(struct Array *arg){}
+void zchannel_func(unsigned char *arg){}
+void pvs_func(unsigned char *arg){}
 
-void ls_func(struct Array *arg){
+void ls_func(unsigned char *arg){
 
      unsigned int i = 0;
      char elem;
@@ -64,8 +64,8 @@ void ls_func(struct Array *arg){
 		 elem = hierarchy.files[CURR_FOLDER].data[i];
 		 if (elem != ',' && elem != ' ') {
 
-                 	write_O((unsigned char*)hierarchy.files[elem - '0'].file_name,
-				sizeof(hierarchy.files[elem - '0'].file_name),RED);
+                 	write_Ons((unsigned char*)hierarchy.files[elem - '0'].file_name
+				,RED);
 			write_O((unsigned char*)sep,sizeof(sep),RED);
 
 			if (hierarchy.files[elem - '0'].type == EXEC_FILE)
@@ -80,8 +80,8 @@ void ls_func(struct Array *arg){
    }
 }
 
-void man_func(struct Array *arg){}
-void exit_func(struct Array *arg){}
+void man_func(unsigned char *arg){}
+void exit_func(unsigned char *arg){}
 
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
 
@@ -151,20 +151,22 @@ static void init_commands(void){
 	command_list[ZCHANNEL_COMMAND].function = &time_func;
 }
 
-static int execute_command(struct Array *command){
+static int execute_command(unsigned char *command){
 
 	unsigned int i;
 	int id = -1;
 	unsigned char error_msg[] = "Error with the given command!\n";
-	unsigned char *cmd;
+	size_t cmd;
 	unsigned int cmdsize;
 
-	cmdsize = get_arg(0, command->data, &cmd);
+	cmdsize = get_arg(0, command, &cmd);
 
 	if (cmdsize > 0) {
 		for (i = 0; i < NUM_COMMANDS; ++i){;
-			if (equal_str(cmd,command_list[i].name, cmdsize,cmdsize) > 0
-				&& (cmd[cmdsize] == ' ' || cmd[cmdsize] == '\n')) {
+			if (equal_str_upto(command+cmd,command_list[i].name,
+				strlen(command_list[i].name)) > 0
+				&& (command[cmd+cmdsize] == ' '
+				|| command[cmd+cmdsize] == '\n')) {
 
 				id = command_list[i].id;
 				command_list[i].function(command);
@@ -174,7 +176,7 @@ static int execute_command(struct Array *command){
 	}
 
 	if(id == -1)
-		write_O((unsigned char*) &error_msg, sizeof(error_msg),RED);
+		write_O((unsigned char*) error_msg, sizeof(error_msg), RED);
 
 	return id;
 }
