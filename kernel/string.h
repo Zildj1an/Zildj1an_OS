@@ -110,6 +110,9 @@ static int equal_str(unsigned char *a, unsigned char *b){
 	return ret;
 }
 
+/**
+ * Tests if both strings are equal up to size
+ */
 static inline int equal_str_upto(unsigned char *a, unsigned char *b, size_t size) {
 	
 	unsigned int sequal = equal_str_size(a, b, size, size);
@@ -141,6 +144,7 @@ unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
 /**
  * Returns the offset of the argnum argument in command, stored in arg,
  * and the size of the argument, or 0 if there are less than argnum arguments
+ * uses the characters in sep as separators and end as the end of the string
  */
 static size_t get_arg_sep(int argnum, unsigned char *command,
 	size_t *arg, char *sep, char end) {

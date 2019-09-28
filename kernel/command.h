@@ -50,6 +50,10 @@ void go_func(unsigned char *arg){
     char elem;
     size_t csize = get_arg(1, arg, &dir);
 
+    if (equal_str_upto((unsigned char *)"top", arg+dir, 3) && csize == 3) {
+	CURR_FOLDER = 0;
+	return;
+    }
 
     size_t offset;
     size_t fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
@@ -58,7 +62,7 @@ void go_func(unsigned char *arg){
 
          elem = hierarchy.files[CURR_FOLDER].data[offset];
 
-         if (elem == '>' && arg[dir] == '>' && csize == 1) {
+         if (elem == '>' && equal_str_upto((unsigned char *)"back", arg+dir, 4) && csize == 4) {
              find = 1;
              CURR_FOLDER = substoi(hierarchy.files[CURR_FOLDER].data+offset+1);
          } else {
