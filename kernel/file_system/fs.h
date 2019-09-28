@@ -2,6 +2,7 @@
 #define _FS_H_
 
 #include "../macros.h"
+#include "../io/text.h"
 
 struct file_str {
 
@@ -37,6 +38,7 @@ static int create_File(unsigned char *name, unsigned int secured, unsigned int t
       hierarchy.files[i].sudo = secured;
       //TODO 1970
       strcpy(hierarchy.files[i].file_name, name);
+      hierarchy.files[i].data[0] = '\0';
 
       return i;
 }
@@ -54,15 +56,38 @@ static void inline init_hierarchy(void){
 //TODO add folder
 static int inline fill_folder(int pos, unsigned char* files){
 
-     unsigned int ret = 0;
+     unsigned int ret = 0, fpos;
+     size_t fend, fsize, offset, i = 0, wend;
 
-     /* Ther is not such folder (TODO msg)*/
-     if(!hierarchy.bitmap[pos] || hierarchy.files[pos].type != FOLDER_FILE)
-		return -1;
+     /* There is not such folder (TODO msg)*/
+     if (!hierarchy.bitmap[pos] || hierarchy.files[pos].type != FOLDER_FILE)
+          return -1;
 
-     strcpy(hierarchy.files[pos].data, files); //TODO function to add at the end of file_descriptor
+     fend = strlen(hierarchy.files[pos].data)-1;
+     if (fend + strlen(files) + 1 > MAX_FILE_SIZE)
+          return -1;      
 
-   return ret;
+     if (fend > 0) {
+          hierarchy.files[pos].data[fend] = ',';     
+          fend += 1;
+     }
+     strcpy(hierarchy.files[pos].data+fend, files);
+
+     fsize = get_arg_sep(i, files, &offset, ",", '\n');
+     while (fsize > 0) {
+          
+          fpos = (unsigned int) substoi(files+offset);
+          
+          if (hierarchy.bitmap[fpos] && hierarchy.files[fpos].type == FOLDER_FILE) {
+               hierarchy.files[fpos].data[0] = '>';
+               wend = itos(pos,hierarchy.files[fpos].data+1);
+               hierarchy.files[fpos].data[wend+1] = '\n';
+	  }
+          ++i;
+          fsize = get_arg_sep(i, files, &offset, ",", '\n');
+     } 
+
+     return ret;
 }
 
 static int init_fs(void){
@@ -70,7 +95,7 @@ static int init_fs(void){
        unsigned char root_folder[] = "Root Folder";
        unsigned char home_folder[] = "home";
        unsigned char sys_folder[]  = "sys";
-       unsigned char files[] = "1,2";
+       unsigned char files[] = "1,2\n";
        int ret;
 
        /* The initial position is CURR_FOLDER = 0 */
@@ -83,7 +108,7 @@ static int init_fs(void){
                 return ret;
 
        if ((ret = fill_folder(0,(unsigned char*)files)) < 0)
-		return ret;
+           return ret;
 
        /* TODO create files README, ENV and some pvslang script (when command implemented) */
 

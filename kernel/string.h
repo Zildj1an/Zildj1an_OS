@@ -142,23 +142,29 @@ unsigned char* strcpy(unsigned char* destination, const unsigned char* source) {
  * Returns the offset of the argnum argument in command, stored in arg,
  * and the size of the argument, or 0 if there are less than argnum arguments
  */
-static size_t get_arg(int argnum, unsigned char *command, size_t *arg) {
+static size_t get_arg_sep(int argnum, unsigned char *command,
+	size_t *arg, char *sep, char end) {
 
-	UINT8 i = 0;
+	UINT8 i = 0, j = 0;
 	UINT8 num = -1;
 	UINT8 found = 0;
 	UINT8 prev = 1;
+	UINT8 is_sep = 0;
 	size_t size = 0;
 
 	*arg = 0;
  	do {
-		if (num == argnum && (command[i] == ' ' || command[i] == '\n')) {
+		is_sep = 0;
+		for(j = 0; j < strlen((unsigned char*)sep); ++j)
+			is_sep += (sep[j] == command[i]);
+
+		if (num == argnum && (is_sep || command[i] == end)) {
 			found = 1;
 			size = i-*arg;
 		} else {
-			if (command[i] == ' ' && !prev) {
+			if (is_sep && !prev) {
 				prev = 1;
-			} else if (command[i] != ' ' && prev) {
+			} else if (!is_sep && prev) {
 				prev = 0;
 				*arg = i;
 				++num;
@@ -170,12 +176,94 @@ static size_t get_arg(int argnum, unsigned char *command, size_t *arg) {
 	return size;
 }
 
+
+static size_t get_arg(int argnum, unsigned char *command, size_t *arg) {
+	
+	char sep[] = " ";
+	char end = '\n';
+	size_t size = get_arg_sep(argnum, command, arg, sep, end);
+	return size;
+}
+
 static inline int is_alpha(char c) {
 	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
 static inline int is_digit(char c) {
 	return ('0' <= c && c <= '9');
+}
+
+static unsigned int stoui(unsigned char *s) {
+
+	size_t size = strlen(s);
+	int ret = 0, i = 0;
+	for (; i < size; ++i) {
+		if (is_digit(s[i])) {
+			ret *= 10;
+			ret += s[i]-'0';
+		} else {
+			ret = INVALID_UINT;
+			break;
+		}
+	}
+	return ret;
+}
+
+static int stoi(unsigned char *s) {
+
+	int ret, mult, off;
+	if (*s == '-') {
+		mult = -1;
+		off = 1;	
+	} else if (*s == '+') {
+		mult = 1;
+		off = 1;
+ 	} else {
+		mult = 1;
+		off = 0;
+	}
+	if ((ret = stoui(s+off)) == INVALID_UINT)
+		ret = INVALID_INT;
+	else
+		ret *= mult;
+	return ret;
+}
+
+/* stoi in a substring: there can be extra characters after the integer*/
+static int substoi(unsigned char *s) {
+	
+	unsigned char buff[30];
+	size_t i = 1;
+	int res;
+	buff[0] = s[0];
+	while (is_digit(s[i])) {
+		buff[i] = s[i];
+		++i;
+	}
+	buff[i] = '\0';
+	res = stoi(buff);
+	return res;
+}
+
+/* return number of chars written */
+static size_t itos(int num, unsigned char *s) {
+	
+	unsigned int i = 0, digs = 0;
+	int aux = num;
+	while (aux > 0) {
+		++digs;
+		aux /= 10;
+	}
+	if (num == 0) {
+		*s = '0';
+		digs = 1;
+	}
+	while (num > 0) {
+		s[digs-i-1] = num % 10;
+		num /= 10;
+		++i;
+	}
+	return digs;
 }
 
 #endif

@@ -26,12 +26,9 @@ void echo_func(unsigned char *arg){
 
 	size_t msg;
 	size_t csize = get_arg(0, arg, &msg);
-	//size_t argsize;
 
-	if (csize) {
-		//argsize = strlen(arg) - msg - csize - 1;
+	if (csize)
 		write_Ons(arg + msg + csize + 1, RED);
-	}
 }
 
 static inline void clear_func(unsigned char *arg){
@@ -44,43 +41,106 @@ void time_func(unsigned char *arg){
     asm_timer();
 }
 
+void go_func(unsigned char *arg){
+
+    /* OPCION go back/go top  -> palabras reservadas al crear archivos!!! */
+    unsigned int i = 0, find = 0, file;
+    size_t dir;
+    unsigned char err[] = "That is not a valid location!\n";
+    char elem;
+    size_t csize = get_arg(1, arg, &dir);
+
+
+    size_t offset;
+    size_t fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
+                                &offset, ",", '\n');
+    while (!find && fsize > 0) {
+
+         elem = hierarchy.files[CURR_FOLDER].data[offset];
+
+         if (elem == '>' && arg[dir] == '>' && csize == 1) {
+             find = 1;
+             CURR_FOLDER = substoi(hierarchy.files[CURR_FOLDER].data+offset+1);
+         } else {
+
+             file = (unsigned int) substoi(hierarchy.files[CURR_FOLDER].data+offset);
+             if (equal_str_upto((unsigned char*)hierarchy.files[file].file_name,
+                                (unsigned char*)arg+dir, csize) > 0){
+
+                 find = 1;
+                 CURR_FOLDER = file;
+             }
+         }
+         ++i;
+         fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
+                                &offset, ",", '\n');
+    }
+
+    if (!find)
+          write_O((unsigned char*)err,sizeof(err),RED);
+}
+
 void zchannel_func(unsigned char *arg){}
 void pvs_func(unsigned char *arg){}
 
 void ls_func(unsigned char *arg){
 
-     unsigned int i = 0;
+     unsigned int i = 0, file;
      char elem;
-     unsigned char msg[] = "\n";
-     unsigned char sep[] = "   -   ";
-     unsigned char exec[] = "EXECUTABLE";
-     unsigned char text[] = "TEXT";
+     unsigned char msg[]    = "\n";
+     unsigned char sep[]    = "-      ";
+     unsigned char exec[]   = "EXECUTABLE";
+     unsigned char text[]   = "TEXT";
      unsigned char folder[] = "FOLDER";
-/*
-     TODO change for sizeof(data in CURR_FOLDER)
-*/
 
-     for(; i < 3 ; ++i){
-		 elem = hierarchy.files[CURR_FOLDER].data[i];
-		 if (elem != ',' && elem != ' ') {
+     size_t offset;
+     size_t fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
+                                &offset, ",", '\n');
+     while (fsize > 0) {
 
-                 	write_Ons((unsigned char*)hierarchy.files[elem - '0'].file_name
-				,RED);
-			write_O((unsigned char*)sep,sizeof(sep),RED);
+         elem = hierarchy.files[CURR_FOLDER].data[offset];
 
-			if (hierarchy.files[elem - '0'].type == EXEC_FILE)
-				write_O((unsigned char*)exec,sizeof(exec),RED);
-			else if (hierarchy.files[elem - '0'].type == TEXT_FILE)
-				 write_O((unsigned char*)text,sizeof(text),RED);
-			else
-				 write_O((unsigned char*)folder,sizeof(folder),RED);
+         if (elem == '>') {
+             // Parent dir, ignore for now
+         } else {   
+             file = (unsigned int) substoi(hierarchy.files[CURR_FOLDER].data+offset);
 
-			write_O((unsigned char*)msg,sizeof(msg),RED);
-   		 }
-   }
+             write_Ons((unsigned char*)hierarchy.files[file].file_name,RED);
+             indent(hierarchy.files[file].file_name);
+             write_O((unsigned char*)sep,sizeof(sep),RED);
+
+             if (hierarchy.files[file].type == EXEC_FILE)
+                 write_O((unsigned char*)exec,sizeof(exec),RED);
+             else if (hierarchy.files[file].type == TEXT_FILE)
+                 write_O((unsigned char*)text,sizeof(text),RED);
+             else
+                 write_O((unsigned char*)folder,sizeof(folder),RED);
+             write_O((unsigned char*)msg,sizeof(msg),RED);
+	 }
+
+         ++i;
+         fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
+                                &offset, ",", '\n');
+     }
 }
 
-void man_func(unsigned char *arg){}
+void info_func(unsigned char *arg){
+
+	unsigned char sep[]    = "-      ";
+	unsigned char next[]   = "\n";
+	unsigned int i = 0;
+
+	for(; i < NUM_COMMANDS; ++i) {
+
+		write_O((unsigned char*)command_list[i].name,sizeof(command_list[i].name),RED);
+		indent(command_list[i].name);
+		write_O((unsigned char*)sep,sizeof(sep),RED);
+		write_O((unsigned char*)command_list[i].description,sizeof(command_list[i].description),RED);
+		write_O((unsigned char*)next,sizeof(next),RED);
+	}
+
+}
+
 void exit_func(unsigned char *arg){}
 
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
@@ -98,6 +158,7 @@ void exit_func(unsigned char *arg){}
 			to see results within this by summer or later
 			Z-CHANNEL COULD BE USED TO EXCHANGE p-vslang FILES
 	6. ?
+	7. mkdir, rmdir
 */
 static void init_commands(void){
 
@@ -120,11 +181,11 @@ static void init_commands(void){
 	command_list[ECHO_COMMAND].id = ECHO_COMMAND;
 	command_list[ECHO_COMMAND].function = &echo_func;
         /*-------------------------------------------------------------------*/
-	strcpy(command_list[MAN_COMMAND].name,(unsigned char*)"man");
-	strcpy(command_list[MAN_COMMAND].description,
+	strcpy(command_list[INFO_COMMAND].name,(unsigned char*)"info");
+	strcpy(command_list[INFO_COMMAND].description,
 			(unsigned char*)"Help about commands");
-	command_list[MAN_COMMAND].id = MAN_COMMAND;
-	command_list[MAN_COMMAND].function = &man_func;
+	command_list[INFO_COMMAND].id = INFO_COMMAND;
+	command_list[INFO_COMMAND].function = &info_func;
         /*-------------------------------------------------------------------*/
 	strcpy(command_list[LS_COMMAND].name,(unsigned char*)"ls");
 	strcpy(command_list[LS_COMMAND].description,
@@ -145,10 +206,16 @@ static void init_commands(void){
 	command_list[ZCHANNEL_COMMAND].id = ZCHANNEL_COMMAND;
 	command_list[ZCHANNEL_COMMAND].function = &zchannel_func;
         /*-------------------------------------------------------------------*/
-	strcpy(command_list[ZCHANNEL_COMMAND].name,(unsigned char*)"time");
-        strcpy(command_list[ZCHANNEL_COMMAND].description,(unsigned char*)"Display current time");
-	command_list[ZCHANNEL_COMMAND].id = TIME_COMMAND;
-	command_list[ZCHANNEL_COMMAND].function = &time_func;
+	strcpy(command_list[TIME_COMMAND].name,(unsigned char*)"time");
+        strcpy(command_list[TIME_COMMAND].description,(unsigned char*)"Display current time");
+	command_list[TIME_COMMAND].id = TIME_COMMAND;
+	command_list[TIME_COMMAND].function = &time_func;
+        /*-------------------------------------------------------------------*/
+        strcpy(command_list[GO_COMMAND].name,(unsigned char*)"go");
+        strcpy(command_list[GO_COMMAND].description,(unsigned char*)"Change the folder");
+        command_list[GO_COMMAND].id = GO_COMMAND;
+        command_list[GO_COMMAND].function = &go_func;
+        /*-------------------------------------------------------------------*/
 }
 
 static int execute_command(unsigned char *command){
@@ -157,16 +224,16 @@ static int execute_command(unsigned char *command){
 	int id = -1;
 	unsigned char error_msg[] = "Error with the given command!\n";
 	size_t cmd;
-	unsigned int cmdsize;
+	unsigned int cmdsize, nmsize;
 
 	cmdsize = get_arg(0, command, &cmd);
 
 	if (cmdsize > 0) {
-		for (i = 0; i < NUM_COMMANDS; ++i){;
-			if (equal_str_upto(command+cmd,command_list[i].name,
-				strlen(command_list[i].name)) > 0
-				&& (command[cmd+cmdsize] == ' '
-				|| command[cmd+cmdsize] == '\n')) {
+		for (i = 0; i < NUM_COMMANDS; ++i) {
+			nmsize = strlen(command_list[i].name);
+			if (equal_str_upto(command+cmd,command_list[i].name, nmsize) > 0
+				&& (command[cmd+nmsize] == ' '
+				|| command[cmd+nmsize] == '\n')) {
 
 				id = command_list[i].id;
 				command_list[i].function(command);

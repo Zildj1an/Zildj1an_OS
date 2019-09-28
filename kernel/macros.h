@@ -14,8 +14,11 @@ typedef unsigned int UINT32;
 typedef unsigned long UINT64;
 typedef int COLOR;
 
+static int CURR_FOLDER = 0;
+
 #define NULL 0
-#define FIRST(A, ...) A
+#define INVALID_UINT 0xFFFFFFFF
+#define INVALID_INT 0x7FFFFFFF
 
 /* VGA Colors */
 #define VGA_ADDRESS 0xB8000
@@ -73,15 +76,16 @@ typedef int COLOR;
 
 /* Commands*/
 #define MAX_COMMAND      60
-#define NUM_COMMANDS     8
+#define NUM_COMMANDS     9
 #define EXIT_COMMAND     0
 #define ECHO_COMMAND     1
-#define MAN_COMMAND      2
+#define INFO_COMMAND     2
 #define LS_COMMAND       3
 #define PVS_COMMAND      4
 #define ZCHANNEL_COMMAND 5
 #define CLEAR_COMMAND    6
 #define TIME_COMMAND     7
+#define GO_COMMAND       8
 
 /* Files */
 #define MAX_FILE_NAME    10
@@ -92,6 +96,5 @@ typedef int COLOR;
 #define FOLDER_FILE      2
 #define PRIVATE_FILE     0
 #define PUBLIC_FILE      1
-#define CURR_FOLDER      0
 
 #endif

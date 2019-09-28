@@ -47,6 +47,7 @@ static inline int invalid_color(COLOR color){
 	  && color != BROWN && color != WHITE);
 }
 
+
 static void scroll_half() {
 
 	unsigned int i, j;
@@ -63,7 +64,7 @@ static void scroll_half() {
 }
 
 /* For now we assume stdout as Output */
-int write_O(unsigned char* msg, size_t count, COLOR color) {
+int __write_O(unsigned char* msg, size_t count, COLOR color) {
 
 	int ret = 0;
 	int i;
@@ -97,6 +98,20 @@ end:
 	return ret;
 }
 
+
+/* Wrapper */
+int write_O(unsigned char* msg, size_t count, COLOR color){
+
+   unsigned char sep[] = " ";
+   int ret;
+
+   if(!positionX)
+          __write_O((unsigned char*)sep, 1, color);
+   ret =  __write_O(msg, count, color);
+
+   return ret;
+}
+
 int write_Ons(unsigned char* msg, COLOR color) {
 	
 	int ret;
@@ -104,6 +119,7 @@ int write_Ons(unsigned char* msg, COLOR color) {
 	ret = write_O(msg, count, color);
 	return ret;
 }
+
 
 static void print_hex(UINT32 kc) {
 
@@ -149,13 +165,13 @@ static int delete_O(size_t count) {
 	int ret,i;
 	unsigned char empty[count];
 
-	for (i = 0; i < count; ++i) 
+	for (i = 0; i < count; ++i)
 		empty[i] = ' ';
 
 	ret = replace_O((unsigned char *) empty, count, GREEN);
 	positionY = (ROW_TEXT-1 + positionY - count/(COLUMN_TEXT-1) ) % (ROW_TEXT-1);
 
-	if (positionX < count) 
+	if (positionX < count)
 		positionY = (ROW_TEXT-1 + positionY - 1)%(ROW_TEXT-1);
 	positionX = (COLUMN_TEXT-1 + positionX - count%(COLUMN_TEXT-1) ) % (COLUMN_TEXT-1);
 
@@ -163,13 +179,12 @@ static int delete_O(size_t count) {
 	return ret;
 }
 
-
 static inline void cleanScreen(void){
 
 	unsigned int i = 0;
 	int max = ROW_TEXT * COLUMN_TEXT;
 
-	for (i = 0; i < max; ++i) 
+	for (i = 0; i < max; ++i)
 		SCREEN_BUFFER[i] = VGA_entry(' ', GREEN);
 
 	positionX = 0;
@@ -211,5 +226,16 @@ static void read_I(unsigned char *command){
 
 	return;
 }
+
+static inline void indent(unsigned char* msg){
+
+        unsigned char sp[] = " ";
+        unsigned int s;
+
+         /* Correct identation */
+         for(s = strlen(msg); s < 15; ++s)
+                       write_O((unsigned char*)sp,1,RED);
+}
+
 
 #endif
