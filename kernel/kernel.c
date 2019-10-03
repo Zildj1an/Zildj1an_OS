@@ -22,7 +22,7 @@ static void display_prompt(){
         unsigned char prompt[]    = "ZildOS_";
 	unsigned char end[] = ">";
 
-	write_O((unsigned char*) &prompt, sizeof(prompt),RED);
+	write_O((unsigned char*) &prompt, sizeof(prompt),WHITE);
 
 	if(CURR_FOLDER)
 		write_O((unsigned char*)hierarchy.files[CURR_FOLDER].file_name,
