@@ -51,6 +51,7 @@ static inline int invalid_color(COLOR color){
 static void scroll_half() {
 
 	unsigned int i, j;
+
 	for (i = ROW_TEXT/2; i < ROW_TEXT; ++i) {
 		for (j = 0; j < COLUMN_TEXT; ++j) {
 			SCREEN_BUFFER[j + (i-ROW_TEXT/2)*COLUMN_TEXT] =
@@ -113,7 +114,7 @@ int write_O(unsigned char* msg, size_t count, COLOR color){
 }
 
 int write_Ons(unsigned char* msg, COLOR color) {
-	
+
 	int ret;
 	size_t count = strlen(msg);
 	ret = write_O(msg, count, color);
@@ -153,7 +154,7 @@ static int replace_O(unsigned char* msg, int count, COLOR color) {
 }
 
 static int replace_Ons(unsigned char* msg, COLOR color) {
-	
+
 	int ret;
 	size_t count = strlen(msg);
 	ret = replace_O(msg, count, color);

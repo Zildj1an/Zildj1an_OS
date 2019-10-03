@@ -17,6 +17,20 @@
 #include "command.h"
 #include "string.h"
 
+static void display_prompt(){
+
+        unsigned char prompt[]    = "ZildOS_";
+	unsigned char end[] = ">";
+
+	write_O((unsigned char*) &prompt, sizeof(prompt),RED);
+
+	if(CURR_FOLDER)
+		write_O((unsigned char*)hierarchy.files[CURR_FOLDER].file_name,
+			   sizeof(hierarchy.files[CURR_FOLDER].file_name), WHITE);
+
+	write_O((unsigned char*) &end, 1,RED);
+}
+
 static void inline welcome_msg(void){
 
         unsigned char msg[]       = "#######################\n";
@@ -30,9 +44,9 @@ static void inline welcome_msg(void){
 
 int main_k(void* minfo){
 
-	unsigned char prompt[]    = "ZildOS >";
 	unsigned char exit_msg[]  = "Good bye!\n";
 	unsigned char error_msg[] = "Memory error, exiting...\n";
+        unsigned char *command;
 
 	cleanScreen();
 	init_cursor();
@@ -46,17 +60,18 @@ int main_k(void* minfo){
 
 	setup_interrupts();
 
-	unsigned char *command = string(MAX_COMMAND);
+	command = string(MAX_COMMAND);
 	welcome_msg();
-
 	init_commands();
 	init_kb();
         init_fs(); 				/* Setup File System */
 
 	while (1) {
-		write_O((unsigned char*) &prompt, sizeof(prompt),GREEN);
+
+                display_prompt();
 		read_I(command);
-		if(execute_command(command) == EXIT_COMMAND){
+
+		if (execute_command(command) == EXIT_COMMAND){
 			write_O((unsigned char*) &exit_msg, sizeof(exit_msg), BLUE);
 			stop_cursor();
 			break;
