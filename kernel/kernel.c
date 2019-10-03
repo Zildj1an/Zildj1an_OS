@@ -44,7 +44,7 @@ static void inline welcome_msg(void){
 
 int main_k(void* minfo){
 
-	unsigned char exit_msg[]  = "Good bye!\n";
+	unsigned char exit_msg[]  = "GOOD BYE!\n";
 	unsigned char error_msg[] = "Memory error, exiting...\n";
         unsigned char *command;
 
@@ -72,7 +72,7 @@ int main_k(void* minfo){
 		read_I(command);
 
 		if (execute_command(command) == EXIT_COMMAND){
-			write_O((unsigned char*) &exit_msg, sizeof(exit_msg), BLUE);
+			write_O((unsigned char*) &exit_msg, sizeof(exit_msg), YELLOW);
 			stop_cursor();
 			break;
 		}

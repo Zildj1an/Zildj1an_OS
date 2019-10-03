@@ -44,7 +44,7 @@ static inline UINT16 VGA_entry(unsigned char msg, COLOR color){
 static inline int invalid_color(COLOR color){
 
 	return (color != BLACK && color != BLUE && color != GREEN && color != RED
-	  && color != BROWN && color != WHITE);
+	  && color != BROWN && color != WHITE && color !=YELLOW);
 }
 
 
