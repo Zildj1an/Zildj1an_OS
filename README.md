@@ -10,7 +10,7 @@ Booting from a USB:
 
 ## Note
 
-This project has to be stalled for a while do to my lack of free-time. But please, feel free to collaborate, it will be reviewed at some point! <3
+This project has to be stalled for a while due to our lack of free-time. But please, feel free to collaborate, it will be reviewed at some point! <3
 
 ## Contributors
 * Carlos Bilbao.
