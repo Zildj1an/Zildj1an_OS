@@ -11,4 +11,5 @@ all:
 	rm -rf isodir
 	rm *.o
 #	qemu-system-x86_64 -cdrom Zildj1anOS.iso
-	qemu-system-x86_64 -kernel boot/kernel.bin -net none
+#	qemu-system-x86_64 -kernel boot/kernel.bin -net none
+	sudo cp boot/kernel.bin /srv/tftp/kernel.bin

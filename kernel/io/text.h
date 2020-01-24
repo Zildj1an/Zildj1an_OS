@@ -80,8 +80,9 @@ int __write_O(unsigned char* msg, size_t count, COLOR color) {
 	for (i = 0; i < count && msg[i] != '\0'; ++i) {
 
 		if(*(msg + i) == '\n') goto line;
+		else if(*(msg + i) == '\t') positionX += 8 - positionX%8;
 
-		SCREEN_BUFFER[positionX + (positionY * COLUMN_TEXT)] = VGA_entry(*(msg + i), color);
+		else SCREEN_BUFFER[positionX + (positionY * COLUMN_TEXT)] = VGA_entry(*(msg + i), color);
 
 		positionX++;
 
@@ -121,13 +122,17 @@ int write_Ons(unsigned char* msg, COLOR color) {
 	return ret;
 }
 
+int printk(char* msg) {
+	write_Ons((unsigned char*) msg, GREEN);
+}
+
 
 static void print_hex(UINT32 kc) {
 
 	// For debugging purposes
 	unsigned char buff[9];
 	unsigned int i;
-	for(i = 0; i < 8; i += 2) {
+	for (i = 0; i < 8; i += 2) {
 		UINT8 fh, sh;
 		fh = kc & 0xF;
 		sh = (kc >> 4) & 0xF;
@@ -137,6 +142,20 @@ static void print_hex(UINT32 kc) {
 	}
 	buff[8] = ' ';
 	write_O((unsigned char *)buff, 9, GREEN);
+}
+
+static void print_dec(UINT32 num) {
+	unsigned char buff[8];
+	unsigned int i = 0;
+	UINT8 first = 1;
+	while ((first || num > 0) && i < 8) {
+		UINT8 dig = num % 10;
+		buff[8-i-1] = hex_to_char(dig);
+		num /= 10;
+		++i;
+		first = 0;
+	}
+	write_O((unsigned char *)(buff+8-i), i, GREEN);
 }
 
 static int replace_O(unsigned char* msg, int count, COLOR color) {

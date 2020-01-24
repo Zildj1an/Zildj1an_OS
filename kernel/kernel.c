@@ -19,7 +19,7 @@
 
 static void display_prompt(){
 
-        unsigned char prompt[]    = "ZildOS_";
+    unsigned char prompt[]    = "ZildOS_";
 	unsigned char end[] = ">";
 
 	write_O((unsigned char*) &prompt, sizeof(prompt),WHITE);
@@ -53,11 +53,13 @@ int main_k(void* minfo){
 
 	int ret;
 
+	welcome_msg();
 	if ((ret = init_mem(minfo)) < 0) {
 		write_O((unsigned char*) &error_msg, sizeof(error_msg), RED);
 		return -1;
 	}
-
+	while(1);
+/*
 	setup_interrupts();
 
 	command = string(MAX_COMMAND);
@@ -65,7 +67,7 @@ int main_k(void* minfo){
 	init_commands();
 	init_kb();
         init_fs(); 				/* Setup File System */
-
+/*
 	while (1) {
 
                 display_prompt();
@@ -77,6 +79,6 @@ int main_k(void* minfo){
 			break;
 		}
 	}
-
+*/
  return 0;
 }
