@@ -171,6 +171,7 @@ static void read_bootinfo(UINT32 *binfo, struct boot_info *bi) {
 	} else {
 	}
 	
+
 }
 
 
