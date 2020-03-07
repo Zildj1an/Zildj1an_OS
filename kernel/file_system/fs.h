@@ -28,6 +28,7 @@ static int create_File(unsigned char *name, unsigned int secured, unsigned int t
 
       unsigned int i = 0;
 
+      /* Check if there is empty space */
       for (; i < NUM_FILES && hierarchy.bitmap[i];++i){}
 
       if (i == NUM_FILES)
@@ -65,19 +66,19 @@ static int inline fill_folder(int pos, unsigned char* files){
 
      fend = strlen(hierarchy.files[pos].data)-1;
      if (fend + strlen(files) + 1 > MAX_FILE_SIZE)
-          return -1;      
+          return -1;
 
      if (fend > 0) {
-          hierarchy.files[pos].data[fend] = ',';     
+          hierarchy.files[pos].data[fend] = ',';
           fend += 1;
      }
      strcpy(hierarchy.files[pos].data+fend, files);
 
      fsize = get_arg_sep(i, files, &offset, ",", '\n');
      while (fsize > 0) {
-          
+
           fpos = (unsigned int) substoi(files+offset);
-          
+
           if (hierarchy.bitmap[fpos] && hierarchy.files[fpos].type == FOLDER_FILE) {
                hierarchy.files[fpos].data[0] = '>';
                wend = itos(pos,hierarchy.files[fpos].data+1);
@@ -95,7 +96,8 @@ static int init_fs(void){
        unsigned char root_folder[] = "Root Folder";
        unsigned char home_folder[] = "home";
        unsigned char sys_folder[]  = "sys";
-       unsigned char files[] = "1,2\n";
+       unsigned char hello_exec[] = "hello.pvs";
+       unsigned char files[] = "1,2\n",sys_file[] = "3\n";
        int ret;
 
        /* The initial position is CURR_FOLDER = 0 */
@@ -107,10 +109,15 @@ static int init_fs(void){
            (ret = create_File((unsigned char*)sys_folder,PUBLIC_FILE,FOLDER_FILE) < 0))
                 return ret;
 
-       if ((ret = fill_folder(0,(unsigned char*)files)) < 0)
-           return ret;
+       if ((ret = fill_folder(CURR_FOLDER,(unsigned char*)files)) < 0)
+       		return ret;
 
-       /* TODO create files README, ENV and some pvslang script (when command implemented) */
+       if ((ret = create_File((unsigned char*)hello_exec,PUBLIC_FILE,EXEC_FILE)) < 0) return ret;
+
+       if ((ret = fill_folder(2,(unsigned char*)sys_file)) < 0)
+	       return ret;
+
+       /* TODO create files README, ENV and some other pvslang scripts */
 
        return ret;
 }

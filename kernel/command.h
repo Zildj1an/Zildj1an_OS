@@ -1,7 +1,7 @@
 /*
    Manages on-terminal command execution
-   Author Carlos Bilbao (Zildj1an)
-          Pablo Villalobos (pablo-vs)
+   Authors Carlos Bilbao (Zildj1an)
+           Pablo Villalobos (pablo-vs)
 */
 
 #ifndef _COMMAND_H
@@ -11,6 +11,7 @@
 #include "io/text.h"
 #include "file_system/fs.h"
 #include "string.h"
+#include "pvs.h"
 
 struct command {
 
@@ -49,14 +50,15 @@ void go_func(unsigned char *arg){
     unsigned char err[] = "That is not a valid location!\n";
     char elem;
     size_t csize = get_arg(1, arg, &dir);
+    size_t offset;
+    size_t fsize;
 
     if (equal_str_upto((unsigned char *)"top", arg+dir, 3) && csize == 3) {
 	CURR_FOLDER = 0;
 	return;
     }
 
-    size_t offset;
-    size_t fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
+    fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
                                 &offset, ",", '\n');
     while (!find && fsize > 0) {
 
@@ -85,7 +87,6 @@ void go_func(unsigned char *arg){
 }
 
 void zchannel_func(unsigned char *arg){}
-void pvs_func(unsigned char *arg){}
 
 void ls_func(unsigned char *arg){
 
@@ -100,13 +101,13 @@ void ls_func(unsigned char *arg){
      size_t offset;
      size_t fsize = get_arg_sep(i, hierarchy.files[CURR_FOLDER].data,
                                 &offset, ",", '\n');
-     while (fsize > 0) {
+     while (fsize) {
 
          elem = hierarchy.files[CURR_FOLDER].data[offset];
 
          if (elem == '>') {
              // Parent dir, ignore for now
-         } else {   
+         } else {
              file = (unsigned int) substoi(hierarchy.files[CURR_FOLDER].data+offset);
 
              write_Ons((unsigned char*)hierarchy.files[file].file_name,RED);
@@ -150,12 +151,12 @@ void exit_func(unsigned char *arg){}
 /* Fill when new command (Increase NUM_COMMANDS macro and add define)
 
    Important commands to do:
-	1. Man or help for displaying commands description
+	1. Man or help for displaying commands description.
 	2. ls or dir (First we need to take care of the file system and managing)
 	3. Providing echo w the possibility to display GLOBAL VARIABLES
 	4. Command p-vs will execute scripts in the language p-vslang
 	This will be very costly as we need an interpreter of loops and other structures
-	but we can start with a basic line-by-line command executor
+	but we can start with a basic line-by-line command executor.
 	5. z-channel . This is going to be last but fucking amazing.
 			We can implement a socket that -by now- will work assuming
 			all ZildOs users are connected to Eduroam. Probably will be able
@@ -200,7 +201,6 @@ static void init_commands(void){
         /*-------------------------------------------------------------------*/
 	strcpy(command_list[PVS_COMMAND].name,(unsigned char*)"p-vs");
 	strcpy(command_list[PVS_COMMAND].description,(unsigned char*)"Execute scripts in the language p-vslang");
-	// TODO: Interpreter
 	command_list[PVS_COMMAND].id = PVS_COMMAND;
 	command_list[PVS_COMMAND].function = &pvs_func;
         /*-------------------------------------------------------------------*/
@@ -222,7 +222,7 @@ static void init_commands(void){
         /*-------------------------------------------------------------------*/
 }
 
-static int execute_command(unsigned char *command){
+int execute_command(unsigned char *command){
 
 	unsigned int i;
 	int id = -1;

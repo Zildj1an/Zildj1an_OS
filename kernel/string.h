@@ -114,7 +114,7 @@ static int equal_str(unsigned char *a, unsigned char *b){
  * Tests if both strings are equal up to size
  */
 static inline int equal_str_upto(unsigned char *a, unsigned char *b, size_t size) {
-	
+
 	unsigned int sequal = equal_str_size(a, b, size, size);
 	return sequal == size;
 }
