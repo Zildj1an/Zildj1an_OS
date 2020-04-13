@@ -1,7 +1,7 @@
 all:
-	nasm -f elf32 start.asm -o start.o
-	nasm -f elf32 kernel/io/mtables.asm -o mtables.o
-	nasm -f elf32 kernel/time.asm -o time.o
+	nasm -f elf64 start.asm -o start.o
+	nasm -f elf64 kernel/io/mtables.asm -o mtables.o
+	nasm -f elf64 kernel/time.asm -o time.o
 	gcc -Wall -g -Wno-unused-function -Wnonnull-compare -fno-stack-protector -mgeneral-regs-only -m32 -c kernel/kernel.c -o k.o
 	ld -m elf_i386 -T link.ld -o boot/kernel.bin start.o k.o mtables.o time.o
 	@if [ $(du -k boot/kernel.bin | grep -o '[0-9]*') -ge 800 ]; then\
